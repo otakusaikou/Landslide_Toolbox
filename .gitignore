@@ -1,0 +1,17 @@
+*.ovr
+*.aux
+*.rrd
+*.img
+*.adf
+*log
+*.xml
+*.dir
+*.dat
+*.nit
+*.dbf
+*.shp
+*.shx
+*.prj
+*.cpg
+*.dbf~
+*log.txt
