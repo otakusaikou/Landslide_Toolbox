@@ -243,8 +243,7 @@ class ZonalSplit:
         if not os.path.exists(outputdir):
             os.mkdir(outputdir)
             
-        if not os.path.exists(identitylayer):
-            os.mkdir(identitylayer)
+
          
     def split(self, filename):
         tStart = time.time()
@@ -362,13 +361,26 @@ def main():
   
 if __name__ == '__main__':
     zonpath = os.getcwd()
+
+
+
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
         configpath = os.path.join(zonpath, "..", "conf", "ZonalSplit.ini")
+
+        identityLayer = os.path.join(root, "identityLayer")
+        if not os.path.exists(identityLayer):
+            os.mkdir(identityLayer)
+
         GUI(os.path.join(root, "input"), os.path.join(root, "output"), os.path.join(root, "identityLayer"))
     else:
         root = os.getcwd()
         configpath = os.path.join(zonpath, "ZonalSplit.ini")
+        
+        identityLayer = os.path.join(root, "identityLayer")
+        if not os.path.exists(identityLayer):
+            os.mkdir(identityLayer)
+
         GUI()
     #read config file
     if not os.path.exists(configpath):
