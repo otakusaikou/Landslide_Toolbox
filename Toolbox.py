@@ -177,6 +177,9 @@ def main():
  
 if __name__ == '__main__':
     #read config file
+    if not os.path.exists(os.path.join(os.getcwd(), "bin", "conf")):
+        os.mkdir(os.path.join(os.getcwd(), "bin", "conf"))
+        
     if not os.path.exists(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini")):
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"), "w")
         settings.write("upload_button=bin/img/load32x32.png\nexport_button=bin/img/export32x32.png\nanalysis_button1=bin/img/analysis132x32.png\nanalysis_button2=bin/img/merge32x32.png\nanalysis_button3=bin/img/zonal32x32.png")

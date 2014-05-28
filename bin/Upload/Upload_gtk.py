@@ -214,6 +214,8 @@ if __name__ == '__main__':
     uploadpath = os.getcwd()
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
+        if not os.path.exists(os.path.join(uploadpath, "..", "conf")):
+            os.mkdir(os.path.join(uploadpath, "..", "conf"))
         configpath = os.path.join(uploadpath, "..", "conf", "Upload.ini")
         GUI(os.path.join(root, "input"))
     else:
@@ -223,12 +225,12 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npasswords=otaku")
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
         settings.close()
         host = "localhost"
-        dbname = "landslide"
+        dbname = "gis"
         user = "postgres"
-        passwords = "otaku"
+        passwords = "mypassword"
         settings.close()
     else:
         settings = open(configpath)

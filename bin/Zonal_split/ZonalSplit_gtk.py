@@ -293,7 +293,7 @@ class ZonalSplit:
             return "Import shapefile data error.", result, True, gtk.MESSAGE_WARNING
             
         #clean old identity layer tables
-        cur.execute(";".join(["DROP TABLE IF EXISTS %s" % os.path.splitext(shp_data)[0] for shp_data in shp_list]))
+        cur.execute(";".join(["DROP TABLE IF EXISTS public.%s" % os.path.splitext(shp_data)[0] for shp_data in shp_list]))
         conn.commit()
         
         #import identity layers
@@ -361,11 +361,10 @@ def main():
   
 if __name__ == '__main__':
     zonpath = os.getcwd()
-
-
-
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
+        if not os.path.exists(os.path.join(zonpath, "..", "conf")):
+            os.mkdir(os.path.join(zonpath, "..", "conf"))
         configpath = os.path.join(zonpath, "..", "conf", "ZonalSplit.ini")
 
         identityLayer = os.path.join(root, "identityLayer")
@@ -385,12 +384,12 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npasswords=otaku")
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
         settings.close()
         host = "localhost"
-        dbname = "landslide"
+        dbname = "gis"
         user = "postgres"
-        passwords = "otaku"
+        passwords = "mypassword"
         settings.close()
     else:
         settings = open(configpath)

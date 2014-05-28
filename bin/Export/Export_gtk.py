@@ -543,7 +543,8 @@ def create_field_list():
         print 'Could not open a database. Please check the config file: "Export.ini"'
     
     results = [row[0] for row in cur.fetchall()]
-    del results[results.index('geom')]
+    if 'geom' in results:
+        del results[results.index('geom')]
     
     return results
 
@@ -591,6 +592,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
         isDefault = False
+        if not os.path.exists(os.path.join(erportpath, "..", "conf")):
+            os.mkdir(os.path.join(erportpath, "..", "conf"))
         configpath = os.path.join(erportpath, "..", "conf", "Export.ini")
     else:
         root = os.getcwd()
@@ -599,14 +602,14 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npasswords=Zeiss10\ntable=new_table\ndatefield=YEAR")
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword\ntable=result\ndatefield=DMCDATE")
         settings.close()
         host = "localhost"
-        dbname = "landslide"
+        dbname = "gis"
         user = "postgres"
-        passwords = "Zeiss10"
-        table = "new_table"
-        datefield = "YEAR"
+        passwords = "mypassword"
+        table = "result"
+        datefield = "DMCDATE"
         settings.close()
     else:
         settings = open(configpath)

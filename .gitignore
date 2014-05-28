@@ -16,3 +16,4 @@
 *.dbf~
 *log.txt
 *.ini
+*.pyc

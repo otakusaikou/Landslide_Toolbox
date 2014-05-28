@@ -1,4 +1,4 @@
-import os, gdal
+import os, gdal, sys
 
 from gdalconst import *
 

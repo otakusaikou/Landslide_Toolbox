@@ -233,6 +233,8 @@ if __name__ == '__main__':
     analysispath = os.getcwd()
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
+        if not os.path.exists(os.path.join(analysispath, "..", "conf")):
+            os.mkdir(os.path.join(analysispath, "..", "conf"))
         configpath = os.path.join(analysispath, "..", "conf", "Analysis.ini")
         GUI(os.path.join(root, "input"), os.path.join(root, "output"))
     else:
@@ -243,12 +245,12 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=Zeiss10")
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
         settings.close()
         host = "localhost"
         database = "gis"
         user = "postgres"
-        password = "Zeiss10"
+        password = "mypassword"
         settings.close()
     else:
         settings = open(configpath)
