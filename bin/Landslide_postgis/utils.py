@@ -14,6 +14,7 @@ import psycopg2
 import sys
 import numpy as np
 from math import sin, cos, pi, atan2, sqrt, degrees
+from gdalconst import *
 
 
 #---------img2map---------
@@ -26,7 +27,7 @@ def imgToWorld(imgX, imgY, z, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, y
     y = yL + (z - zL) * b / d
     return (x, y)
 
-def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, inputdir, outputdir, date):
+def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, inputdir, outputdir, date, demlayer):
     #initial variable
     focalLength = 120.0
     dmcCols = 7680
@@ -68,6 +69,22 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
     sys.stdout.write("[%s]    0%%" % (" " * 65))
     sys.stdout.flush()
     sys.stdout.write("\b" * (72)) #return to start of line, after '['
+
+    #read dem files
+    gdal.AllRegister()
+
+    ds = gdal.Open(demlayer, GA_ReadOnly)
+
+    if ds is None:
+        print 'Could not open image: %s' % img_name
+        return False
+
+    transform = ds.GetGeoTransform()
+    metadatainf = [ds.RasterYSize, ds.RasterXSize, transform[0], transform[3], transform[1], transform[5]]
+
+    band = ds.GetRasterBand(1)
+    data = band.ReadAsArray(0, 0, ds.RasterXSize, ds.RasterYSize)
+
     
     for shp in shapes:
         parts = shp.parts
@@ -110,7 +127,7 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
                     x, y = imgToWorld(imgX, imgY, z0, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, focalLength)
                     #print 'x, y, z0 = ', x, y, z0
                     
-                    z = readimg.getElev(x, y)
+                    z = readimg.getElev(data, metadatainf, x, y)
                     #print 'x, y, z = ', x, y, z
                     
                     if abs(z - z0) <= threshold:
@@ -145,7 +162,7 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
     sys.stdout.write("[" + "=" * 65 + "]  100%\n")
     
     
-def img2map(shpList, inputdir, outputdir):
+def img2map(shpList, inputdir, outputdir, demlayer):
     result = ""
     for shp in shpList:
         if shp[-3:] != "shp":
@@ -181,7 +198,7 @@ def img2map(shpList, inputdir, outputdir):
         
         print "Processing coordinate transformation of shapefile '%s'..." % shp
         result += "Processing coordinate transformation of shapefile '%s'...\n" % shp
-        readPoly(baseName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, inputdir, outputdir, date)
+        readPoly(baseName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, inputdir, outputdir, date, demlayer)
         
     return result
 #---------img2map---------
@@ -219,7 +236,7 @@ def decide_raster(shp_name):
     del sf
 
 
-def landslide_analysis(conn, inputdir, outputdir, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
+def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
     result = ""
     #get shapefile list
     os.chdir(inputdir)
@@ -228,18 +245,31 @@ def landslide_analysis(conn, inputdir, outputdir, host, database, user, password
     #check raster data 
     try:
         cur = conn.cursor()
-        cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='" + "slope_a" + "')")
+        #import slope layer
+        slopedir, slopefile = os.path.split(slopelayer)
+        #check if slope raster table exists
+        cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='slopelayer')")
         exists = cur.fetchone()[0]
         if not exists:
-            for rast in ["slope_a", "slope_b", "aspect_a", "aspect_b"]:
-                os.chdir(raster_data)  #change directory to  Toolbox\bin\Landslide_postgis\reference_data
-                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 %s | psql -d %s -U %s" % (rast, rast, database, user)
-                print "Import raster data '%s' to database '%s'..." % (rast, database)
-                result += "Import raster data '%s' to database '%s'...\n" % (rast, database)
-                #result += os.popen(cmdstr).read()
+                os.chdir(slopedir)
+                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -d %s -U %s" % (slopefile, database, user)
+                print "Import raster data '%s' to database '%s' as table 'slopelayer'..." % (slopefile, database)
+                result += "Import raster data '%s' to database '%s' as table 'slopelayer'...\n" % (slopefile, database)
                 os.popen(cmdstr)
                 os.chdir(inputdir)  #change directory to Toolbox\output\tmpdir
-        
+
+        #import aspect layer
+        aspectdir, aspectfile = os.path.split(aspectlayer)
+        #check if aspect raster table exists
+        cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='aspectlayer')")
+        exists = cur.fetchone()[0]
+        if not exists:
+                os.chdir(aspectdir)
+                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -d %s -U %s" % (aspectfile, database, user)
+                print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
+                result += "Import raster data '%s' to database '%s' as table 'aspectlayer'...\n" % (aspectfile, database)
+                os.popen(cmdstr)
+                os.chdir(inputdir)  #change directory to Toolbox\output\tmpdir
     except:
         conn.close()
         result += "Import raster data error.\n"
@@ -395,9 +425,6 @@ def landslide_analysis(conn, inputdir, outputdir, host, database, user, password
                 cur.execute(sql + "DROP TABLE IF EXISTS TP;\n")
                 conn.commit()
             
-            
-            
-            
             cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
             conn.commit()
             conn.close()
@@ -407,7 +434,7 @@ def landslide_analysis(conn, inputdir, outputdir, host, database, user, password
         try:
             print "Execute zonal statistic analysis..."
             result += "Execute zonal statistic analysis...\n"
-            cur.execute(open(os.path.join(raster_data, "zonalAnalysis.sql"), "r").read().replace("aspect_raster", "aspect_%s" % decide_raster(shp_data)).replace("slope_raster", "slope_%s" % decide_raster(shp_data)))
+            cur.execute(open(os.path.join(raster_data, "zonalAnalysis.sql"), "r").read())
             conn.commit()
         except:
             conn.rollback()

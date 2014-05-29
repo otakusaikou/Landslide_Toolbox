@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS tmp;
 
 CREATE TEMP TABLE tmp AS 
  SELECT inputdata.*, AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) AS slope_mean
- FROM slope_raster, inputdata
+ FROM slopelayer, inputdata
  WHERE ST_Intersects(geom, rast) 
 GROUP BY gid
 HAVING AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) > 17;
@@ -32,7 +32,7 @@ SELECT gid,
 	ABS(main_direc - ABS(180 - AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean))) collapse,
 	AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) AS aspect_mean,
 	geom
- FROM aspect_raster, tmp
+ FROM aspectlayer, tmp
  WHERE ST_Intersects(geom, rast)
 GROUP BY gid, shp_id, dmcname, project, dmcdate, area_pxl, brightness, lengthwidt, main_direc, ndvi, slope_mean, geom;
 

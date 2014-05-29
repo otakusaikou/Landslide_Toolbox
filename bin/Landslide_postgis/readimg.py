@@ -1,69 +1,19 @@
 import os, gdal, sys
 
-from gdalconst import *
+def getElev(data, metadatainf, x, y):
+    rows = metadatainf[0] 
+    cols = metadatainf[1] 
+    xOrigin = metadatainf[2] 
+    yOrigin = metadatainf[3] 
+    pixelWidth = metadatainf[4] 
+    pixelHeight = metadatainf[5] 
 
-#dir_name = "f:/gdal"
-#dir_name = "J:/eCoginition/shp/GDAL/gdal"
-dir_name = os.getcwd()
-
-#img_name = 'Chi-Shan_9m_R_0823.img'
-img_name = 'Chi-Shan_9m_R_0823.img'
-#img_name = 'tw20-97.lan'
-
-gdal.AllRegister()
-
-ds = gdal.Open(os.path.join(dir_name, "reference_data", img_name), GA_ReadOnly)
-
-if ds is None:
-    print 'Could not open image: %s' % img_name
-    sys.exit(1)
-    
-rows = ds.RasterYSize
-cols = ds.RasterXSize
-bands = ds.RasterCount
-
-transform = ds.GetGeoTransform()
-xOrigin = transform[0]
-yOrigin = transform[3]
-pixelWidth = transform[1]
-pixelHeight = transform[5]
-
-print 'rows = ', rows
-print 'cols = ', cols
-print 'bands = ', bands
-print 'xOrigin = ', xOrigin
-print 'yOrigin = ', yOrigin
-print 'pixelWidth = ', pixelWidth
-print 'pixelHeight = ', pixelHeight
-
-band = ds.GetRasterBand(1)
-data = band.ReadAsArray(0, 0, cols, rows)
-
-#224,525.148  2,581,643.814  Stretched value	149  Pixel value	1138.619995
-'''
-x = int((224525.148 - xOrigin) / pixelWidth)
-y = int((2581643.814 - yOrigin) / pixelHeight)
-data = band.ReadAsArray(x, y, 1, 1)
-print '(%d, %d) = %f' % (x, y, data)
-
-data = band.ReadAsArray(0, 0, cols, rows)
-
-print 'len = ', len(data)
-
-print '(%d, %d) = %f' % (y, x, data[y,x])
-def getElev(x, y):
-    xOffset = int((x - xOrigin) / pixelWidth)
-    yOffset = int((y - yOrigin) / pixelHeight)
-    return data[yOffset,xOffset]
-'''
-    
-
-def getElev(x, y):
     xOffset = int((x - xOrigin) / pixelWidth)
     yOffset = int((y - yOrigin) / pixelHeight)
     
     x1 = xOrigin + xOffset * pixelWidth
     y1 = yOrigin + yOffset * pixelHeight
+
     z1 = data[yOffset, xOffset]
     p = [[x1, y1, z1]]
     

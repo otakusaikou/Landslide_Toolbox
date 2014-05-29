@@ -25,10 +25,10 @@ class GUI:
         self.button1.set_current_folder(self.inputdir)
         self.button2.set_current_folder(self.outputdir)
         
-    def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output")):
+    def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Landslide_processor.py')
-        window.set_size_request(350, 220)
+        window.set_size_request(350, 500)
         window.connect('destroy', lambda w: gtk.main_quit())
 
         mainbox = gtk.VBox(False, 10)
@@ -45,6 +45,9 @@ class GUI:
         
         self.inputdir = inputdir
         self.outputdir = outputdir
+        self.demlayer = demlayer
+        self.slopelayer = slopelayer
+        self.aspectlayer = aspectlayer
 
         
     ##menu bar
@@ -80,21 +83,124 @@ class GUI:
         
         hbox.show()
         hsaparator.show()
-
-    ##output directory path
-        self.label2 = gtk.Label("The output directory path...")
+    
+    ##dem layer 
+        self.label2 = gtk.Label("The dem layer path...")
         hbox = gtk.HBox(False, 5)
         mainbox.pack_start(hbox, True, False, 0)
-        hbox.pack_start(self.label2, False, True, 5)   
+        hbox.pack_start(self.label2, False, True, 5)  
+        
+        self.label2.show()
+        hbox.show() 
           
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 0)
         
-        self.button2 = gtk.FileChooserButton('Output directory')
-        self.button2.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-        self.button2.set_current_folder(self.outputdir)
-        hbox.pack_start(self.button2, True, True, 0)   
+        self.button2 = gtk.FileChooserButton('DEM layer path')
+        self.button2.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+        self.button2.set_current_folder(self.demlayer)
+        filter = gtk.FileFilter()
+        filter.add_pattern("*.img")
+        filter.add_pattern("*.tif")
+        filter.add_pattern("*.adf")
+        self.button2.set_filter(filter)
+        hbox.pack_start(self.button2, True, True, 0)
+        
+        hbox.show()
+        self.button2.show()
+    
+    ##separator
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        hsaparator = gtk.HSeparator()
+        hbox.pack_start(hsaparator, True, True, 10)
+        
+        hbox.show()
+        hsaparator.show()
+    
+    ##slope layer 
+        self.label3 = gtk.Label("The slope layer path...")
+        hbox = gtk.HBox(False, 5)
+        mainbox.pack_start(hbox, True, False, 0)
+        hbox.pack_start(self.label3, False, True, 5)  
+        
+        self.label3.show()
+        hbox.show() 
+          
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        self.button3 = gtk.FileChooserButton('Slope layer path')
+        self.button3.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+        self.button3.set_current_folder(self.slopelayer)
+        self.button3.set_filter(filter)
+        hbox.pack_start(self.button3, True, True, 0)
+        
+        hbox.show()
+        self.button3.show()
+        
+    ##separator
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        hsaparator = gtk.HSeparator()
+        hbox.pack_start(hsaparator, True, True, 10)
+        
+        hbox.show()
+        hsaparator.show()
+
+    ##aspect layer 
+        self.label4 = gtk.Label("The aspect layer path...")
+        hbox = gtk.HBox(False, 5)
+        mainbox.pack_start(hbox, True, False, 0)
+        hbox.pack_start(self.label4, False, True, 5)  
+        
+        self.label4.show()
+        hbox.show() 
+          
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        self.button4 = gtk.FileChooserButton('Aspect layer path')
+        self.button4.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+        self.button4.set_current_folder(self.aspectlayer)
+        self.button4.set_filter(filter)
+        hbox.pack_start(self.button4, True, True, 0)
+        
+        hbox.show()
+        self.button4.show()
+        
+    ##separator
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        hsaparator = gtk.HSeparator()
+        hbox.pack_start(hsaparator, True, True, 10)
+        
+        hbox.show()
+        hsaparator.show()
+
+    ##output directory path
+        self.label5 = gtk.Label("The output directory path...")
+        hbox = gtk.HBox(False, 5)
+        mainbox.pack_start(hbox, True, False, 0)
+        hbox.pack_start(self.label5, False, True, 5)   
+          
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 0)
+        
+        self.button5 = gtk.FileChooserButton('Output directory')
+        self.button5.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        self.button5.set_current_folder(self.outputdir)
+        hbox.pack_start(self.button5, True, True, 0)   
 
     ##analyze button box
         hbox = gtk.HBox(False, 0)
@@ -102,7 +208,7 @@ class GUI:
         mainbox.pack_start(hbox, True, False, 5)
 
         button = gtk.Button('Analyze')
-        button.connect('clicked', self.transform, self.button1, self.button2)
+        button.connect('clicked', self.transform)
         button.set_size_request(70, 25)
         hbox.pack_start(button, True, False, 0)
 
@@ -120,11 +226,37 @@ class GUI:
         settings.close()
         
     
-    def transform(self, widget, inputfile, outputdir):
+    def transform(self, widget):
         #read config file
         self.reloadConfig()
-        A = Analysis(self.button1.get_filename(), self.button2.get_filename())
-        msg, result, writelog, icon = A.transform()
+
+        #get shapefile list
+        os.chdir(self.button1.get_filename())
+        shp_list = glob.glob("*.shp")
+        os.chdir(analysispath)
+        
+        #check if the inputdir is empty
+        if len(shp_list) == 0:
+            self.showMessage("Can't find any shapefile in input directory.", None, False, gtk.MESSAGE_WARNING)
+            return 
+ 
+        #check if the dem raster file is valid
+        if not self.button2.get_filename():
+            self.showMessage("Can't find any valid dem raster file.", None, False, gtk.MESSAGE_WARNING)
+            return
+
+        #check if the slope raster file is valid
+        if not self.button3.get_filename():
+            self.showMessage("Can't find any valid slope raster file.", None, False, gtk.MESSAGE_WARNING)
+            return
+
+        #check if the aspect raster file is valid
+        if not self.button4.get_filename():
+            self.showMessage("Can't find any valid aspect raster file.", None, False, gtk.MESSAGE_WARNING)
+            return 
+
+        A = Analysis(self.button1.get_filename(), self.button5.get_filename(), self.button2.get_filename(), self.button3.get_filename(), self.button4.get_filename())
+        msg, result, writelog, icon = A.transform(shp_list)
         self.showMessage(msg, result, writelog, icon)
         
     #pop up error message and write out result
@@ -140,7 +272,7 @@ class GUI:
         
         if writelog:
             result += msg + "\n"
-            os.chdir(self.button2.get_filename())
+            os.chdir(self.button5.get_filename())
             log = open("log.txt", "a")
             log.write("-"*34 + time.strftime("%Y%m%d_%H%M%S", time.gmtime()) + "-"*34 + "\n")
             log.write(result)
@@ -149,10 +281,13 @@ class GUI:
             os.chdir(root)
         
 class Analysis:
-    def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output")):
+    def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         #initialize I/O directory
         self.inputdir = inputdir
         self.outputdir = outputdir
+        self.demlayer = demlayer
+        self.slopelayer = slopelayer
+        self.aspectlayer = aspectlayer
         self.tmpdir = os.path.join(self.outputdir, "tmpdir")
         
         if not os.path.exists(self.inputdir):
@@ -170,7 +305,7 @@ class Analysis:
         if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
             os.mkdir(os.path.join(self.outputdir, "Landslide")) 
             
-    def transform(self):
+    def transform(self, shp_list):
         tStart = time.time()
         
         result = ""
@@ -181,24 +316,14 @@ class Analysis:
             cur = conn.cursor()
         except:
             return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
-            
-        #get shapefile list
-        os.chdir(self.inputdir)
-        shp_list = glob.glob("*.shp")
-        os.chdir(analysispath)
-        
-        #check if the inputdir is empty
-        if len(shp_list) == 0:
-            conn.close()
-            return "Can't find any shapefile in input directory.", result, False, gtk.MESSAGE_WARNING
-        
-        retult = ""
+
+        result = ""
         
         #coordinate transformation
-        result += img2map(shp_list, self.inputdir, self.tmpdir)
+        result += img2map(shp_list, self.inputdir, self.tmpdir, self.demlayer)
         
         #landslide analysis
-        msg, result2, writelog, haveerror = landslide_analysis(conn, self.tmpdir, self.outputdir, host, database, user, password)
+        msg, result2, writelog, haveerror = landslide_analysis(conn, self.tmpdir, self.outputdir, self.slopelayer, self.aspectlayer, host, database, user, password)
         
         #update result
         result += result2
@@ -236,10 +361,28 @@ if __name__ == '__main__':
         if not os.path.exists(os.path.join(analysispath, "..", "conf")):
             os.mkdir(os.path.join(analysispath, "..", "conf"))
         configpath = os.path.join(analysispath, "..", "conf", "Analysis.ini")
-        GUI(os.path.join(root, "input"), os.path.join(root, "output"))
+        
+        inputdir = os.path.join(root, "input")
+        if not os.path.exists(inputdir):
+            os.mkdir(inputdir)
+
+        outputdir = os.path.join(root, "output")
+        if not os.path.exists(outputdir):
+            os.mkdir(outputdir)
+
+        GUI(inputdir, outputdir)
     else:
         root = os.getcwd()
         configpath = os.path.join(analysispath, "Analysis.ini")
+        
+        inputdir = os.path.join(root, "input")
+        if not os.path.exists(inputdir):
+            os.mkdir(inputdir)
+
+        outputdir = os.path.join(root, "output")
+        if not os.path.exists(outputdir):
+            os.mkdir(outputdir)
+        
         GUI()
         
     #read config file
