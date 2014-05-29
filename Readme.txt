@@ -14,3 +14,8 @@ This program is a toolbox written for the following function:
 2.Config directory error fixed.
 3.Default config settings modified.
 -----------2014-05-28 23:41-----------
+
+-----------2014-05-29 18:19-----------
+1.Add three file dialog to specify dem, slope and aspect raster data.
+2.Bug in making new I/O directories fixed.
+-----------2014-05-29 18:19-----------
