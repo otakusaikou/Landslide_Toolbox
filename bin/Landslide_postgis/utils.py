@@ -216,24 +216,18 @@ def getExtent(filename):
 
 #global variable
 root = os.getcwd()
+reference_data = os.path.join(root, "reference_data")
+skipped_list = []
 
-raster_data = os.path.join(root, "reference_data")
-
-left_a, bottom_a, right_a, top_a = getExtent(os.path.join(raster_data, "slope_a"))
-left_b, bottom_b, right_b, top_b = getExtent(os.path.join(raster_data, "slope_b"))
-
-def decide_raster(shp_name):
+#check if shapefile extent contained in raster layer content
+def shpInRaster(shp_name, rasterlayer):
+    raster_left, raster_bottom, raster_right, raster_top = getExtent(rasterlayer)
     sf = shapefile.Reader(shp_name)
     left,bottom,right,top = sf.bbox
-    
-    if left >= left_a and bottom >= bottom_a and right <= right_a and top <= top_a:
-        return "a"
-    elif left >= left_b and bottom >= bottom_b and right <= right_b and top <= top_b:
-        return "b"
-    else:
-        return "c"
-    
     del sf
+    if left >= raster_left and bottom >= raster_bottom and right <= raster_right and top <= raster_top:
+        return True
+    return False
 
 
 def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
@@ -277,7 +271,21 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host,
         
     c = 0
     for shp_data in shp_list:
-        c+=1
+        c += 1
+        
+        #check if shapefile extent is contained in raster layer content
+        if not shpInRaster(shp_data, slopelayer):
+            print "Warning: shapefile '%s' has no overlapping area with  slope raster layer '%s'. Skip analysis of this shapefile." % (shp_data, slopefile)
+            result += "Warning: shapefile '%s' has no overlapping area with slope raster layer '%s'. Skip analysis of this shapefile.\n" % (shp_data, slopefile)
+            skipped_list.append(shp_data)
+            continue
+            
+        if not shpInRaster(shp_data, aspectlayer):
+            print "Warning: shapefile '%s' has no overlapping area with  aspect raster layer '%s'. Skip analysis of this shapefile." % (shp_data, aspectfile)
+            result += "Warning: shapefile '%s' has no overlapping area with aspect raster layer '%s'. Skip analysis of this shapefile.\n" % (shp_data, aspectfile)
+            skipped_list.append(shp_data)
+            continue
+        
         #clean old data
         cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
         conn.commit()
@@ -434,7 +442,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host,
         try:
             print "Execute zonal statistic analysis..."
             result += "Execute zonal statistic analysis...\n"
-            cur.execute(open(os.path.join(raster_data, "zonalAnalysis.sql"), "r").read())
+            cur.execute(open(os.path.join(reference_data, "zonalAnalysis.sql"), "r").read())
             conn.commit()
         except:
             conn.rollback()
@@ -487,6 +495,8 @@ def add_sfid_fields(inputdir, outputdir):
     shp_list = glob.glob("*.shp")
     os.chdir(root)
     for imageFile in shp_list:
+        if imageFile in skipped_list:
+            continue
         sf = shapefile.Reader(os.path.join(inputdir, imageFile))
     
         shapes = sf.shapes()
@@ -546,6 +556,8 @@ def extract_origin(inputdir, outputdir):
     add_sfid_fields(inputdir, outputdir)
     
     for shpfile in shp_list:
+        if shpfile in skipped_list:
+            continue
         print "Transform projected polygon of shapefile '%s' to original image CRS...(%d / %d)" % (shpfile.replace("~", "_"), count, len(shp_list))
         result += "Transform projected polygon of shapefile '%s' to original image CRS...(%d / %d)\n" % (shpfile.replace("~", "_"), count, len(shp_list))
         # Read corrected landslides

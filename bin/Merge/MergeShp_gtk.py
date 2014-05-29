@@ -557,10 +557,28 @@ if __name__ == '__main__':
         if not os.path.exists(os.path.join(mergepath, "..", "conf")):
             os.mkdir(os.path.join(mergepath, "..", "conf"))
         configpath = os.path.join(mergepath, "..", "conf", "MergeShp.ini")
-        GUI(os.path.join(root, "input"), os.path.join(root, "output"))
+        
+        inputdir = os.path.join(root, "input")
+        if not os.path.exists(inputdir):
+            os.mkdir(inputdir)
+
+        outputdir = os.path.join(root, "output")
+        if not os.path.exists(outputdir):
+            os.mkdir(outputdir)
+        
+        GUI(inputdir, outputdir)
     else:
         root = os.getcwd()
         configpath = os.path.join(mergepath, "MergeShp.ini")
+        
+        inputdir = os.path.join(root, "input")
+        if not os.path.exists(inputdir):
+            os.mkdir(inputdir)
+
+        outputdir = os.path.join(root, "output")
+        if not os.path.exists(outputdir):
+            os.mkdir(outputdir)
+        
         GUI()
     #read config file
     if not os.path.exists(configpath):

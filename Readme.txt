@@ -1,7 +1,7 @@
 Author: Otakusaikou
-Last Updated: 2014/05/28
+Created: 2014/05/28
 -----------Description-----------
-This program is a toolbox written for the following function:
+This program is a toolbox written for the following functions:
 1.Upload: Upload shapefile to database as table.
 2.Export: Export geometry table as shapefile.
 3.Analysis: Transformate coordinates from image coordinates to world coordinates(TWD97), filtering error with DEM, Slope and Aspect.
@@ -19,3 +19,7 @@ This program is a toolbox written for the following function:
 1.Add three file dialog to specify dem, slope and aspect raster data.
 2.Bug in making new I/O directories fixed.
 -----------2014-05-29 18:19-----------
+
+-----------2014-05-29 20:40-----------
+1.Add function to check if shapefile extent is contained in raster layer, making program to skip shapefiles sitting outside of raster layers.
+-----------2014-05-29 20:40-----------
