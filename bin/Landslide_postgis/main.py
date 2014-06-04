@@ -28,7 +28,7 @@ class GUI:
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Landslide_processor.py')
-        window.set_size_request(350, 500)
+        window.set_size_request(430, 500)
         window.connect('destroy', lambda w: gtk.main_quit())
 
         mainbox = gtk.VBox(False, 10)
@@ -140,6 +140,11 @@ class GUI:
         self.button3.set_filter(filter)
         hbox.pack_start(self.button3, True, True, 0)
         
+        self.overwriteBtn1 = gtk.CheckButton("Overwrite Old Table")
+        self.overwriteBtn1.set_active(False)
+        hbox.pack_start(self.overwriteBtn1, False, False, 10)
+        self.overwriteBtn1.show()
+        
         hbox.show()
         self.button3.show()
         
@@ -173,6 +178,11 @@ class GUI:
         self.button4.set_filter(filter)
         hbox.pack_start(self.button4, True, True, 0)
         
+        self.overwriteBtn2 = gtk.CheckButton("Overwrite Old Table")
+        self.overwriteBtn2.set_active(False)
+        hbox.pack_start(self.overwriteBtn2, False, False, 10)
+        self.overwriteBtn2.show()
+
         hbox.show()
         self.button4.show()
         
@@ -256,7 +266,7 @@ class GUI:
             return 
 
         A = Analysis(self.button1.get_filename(), self.button5.get_filename(), self.button2.get_filename(), self.button3.get_filename(), self.button4.get_filename())
-        msg, result, writelog, icon = A.transform(shp_list)
+        msg, result, writelog, icon = A.transform(shp_list, self.overwriteBtn1.get_active(), self.overwriteBtn2.get_active())
         self.showMessage(msg, result, writelog, icon)
         
     #pop up error message and write out result
@@ -305,7 +315,7 @@ class Analysis:
         if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
             os.mkdir(os.path.join(self.outputdir, "Landslide")) 
             
-    def transform(self, shp_list):
+    def transform(self, shp_list, overwriteSlope, overwriteAspect):
         tStart = time.time()
         
         result = ""
@@ -323,7 +333,7 @@ class Analysis:
         result += img2map(shp_list, self.inputdir, self.tmpdir, self.demlayer)
         
         #landslide analysis
-        msg, result2, writelog, haveerror = landslide_analysis(conn, self.tmpdir, self.outputdir, self.slopelayer, self.aspectlayer, host, database, user, password)
+        msg, result2, writelog, haveerror = landslide_analysis(conn, self.tmpdir, self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
         
         #update result
         result += result2

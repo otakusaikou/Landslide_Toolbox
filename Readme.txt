@@ -24,3 +24,7 @@ This program is a toolbox written for the following functions:
 -----------2014-05-29 20:40-----------
 1.Add function to check if shapefile extent is contained in raster layer, making program to skip shapefiles sitting outside of raster layers.
 -----------2014-05-29 20:40-----------
+
+-----------2014-06-04 12:30-----------
+1.Analysis: Add two check button to check whether to overwrite existing raster table in database. 
+-----------2014-06-04 12:30-----------

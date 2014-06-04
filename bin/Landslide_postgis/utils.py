@@ -230,7 +230,7 @@ def shpInRaster(shp_name, rasterlayer):
     return False
 
 
-def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
+def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, aspectlayer, overwriteAspect, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
     result = ""
     #get shapefile list
     os.chdir(inputdir)
@@ -244,7 +244,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host,
         #check if slope raster table exists
         cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='slopelayer')")
         exists = cur.fetchone()[0]
-        if not exists:
+        if not exists or overwriteSlope:
                 os.chdir(slopedir)
                 cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -d %s -U %s" % (slopefile, database, user)
                 print "Import raster data '%s' to database '%s' as table 'slopelayer'..." % (slopefile, database)
@@ -257,7 +257,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, aspectlayer, host,
         #check if aspect raster table exists
         cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='aspectlayer')")
         exists = cur.fetchone()[0]
-        if not exists:
+        if not exists or overwriteAspect:
                 os.chdir(aspectdir)
                 cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -d %s -U %s" % (aspectfile, database, user)
                 print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
