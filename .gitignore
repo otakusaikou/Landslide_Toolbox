@@ -12,6 +12,8 @@
 *.shp
 *.shx
 *.prj
+*.qpj
+*.rar
 *.cpg
 *.dbf~
 *log.txt
