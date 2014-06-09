@@ -310,7 +310,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
                     DROP TABLE IF EXISTS TP; 
                     CREATE TABLE TP AS
                     SELECT rid, (ST_PixelAsPoints(rast)).*
-                    FROM (SELECT ST_AsRaster(geom, 1.0, 1.0, '8BUI') rast, gid rid
+                    FROM (SELECT ST_AsRaster(geom, 5.0, 5.0, '8BUI') rast, gid rid
                     FROM inputdata) AS T1_R;"""
             cur.execute(sql) 
             conn.commit()

@@ -36,3 +36,7 @@ This program is a toolbox written for the following functions:
 -----------2014-06-07 17:30-----------
 1.Zonal Split: Modify sql file, replace all '<NONE>' and NULL values with '_' in output result.
 -----------2014-06-07 17:30-----------
+
+-----------2014-06-09 17:05-----------
+1.Analysis: Change rasterizing pixel size from 1mx1m to 5mx5m.
+-----------2014-06-09 17:05-----------
