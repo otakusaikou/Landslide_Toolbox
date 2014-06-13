@@ -46,7 +46,19 @@ class GUI(gtk.Window):
         frame1.add(scrollwindow1)
         
         self.selected_feature = None
-        self.liststore1 = self.create_model(create_field_list(), True)
+        try:
+            self.liststore1 = self.create_model(create_field_list(), True)
+        except:
+            print 'Could not open a database. Please check the config file: "Export.ini"'
+            messagedialog = gtk.MessageDialog(self, 
+                gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
+                gtk.BUTTONS_CLOSE, 'Could not open a database. Please check the config file: "Export.ini"')
+        
+            messagedialog.set_position(gtk.WIN_POS_CENTER)
+            messagedialog.run()
+            messagedialog.destroy()
+            exit()
+        
         self.treeview1 = gtk.TreeView(self.liststore1)
         self.treeview1.connect("cursor-changed", self.on_activated)
         self.treeview1.set_rules_hint(True)
@@ -643,13 +655,13 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword\ndatefield=DMCDATE")
+        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npasswords=mypassword\ndatefield=DMCDATE")
         settings.close()
         host = "localhost"
-        dbname = "gis"
+        dbname = "landslide"
         user = "postgres"
         passwords = "mypassword"
-        datefield = "DMCDATE"
+        split_field = "DMCDATE"
         settings.close()
     else:
         settings = open(configpath)

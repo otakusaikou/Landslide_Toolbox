@@ -45,3 +45,7 @@ This program is a toolbox written for the following functions:
 1.Analysis: Delete meaningless statement.
 2.Export: Add support of database having new structure.Disable function of split query result with date/year column.
 -----------2014-06-13 16:48-----------
+
+-----------2014-06-13 17:08-----------
+1.Export: Bug in connecting to database fixed.
+-----------2014-06-13 17:08-----------
