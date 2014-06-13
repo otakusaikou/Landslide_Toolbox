@@ -244,10 +244,12 @@ class GUI(gtk.Window):
         self.entry1 = gtk.Entry()
         self.entry1.set_size_request(250, 20)
         hbox4.pack_start(self.entry1, False, False, 0)
+        self.entry1.set_sensitive(False)
         self.entry1.show()###
         
         self.checkbutton1 = gtk.CheckButton("Split Shapefile By %s" % split_field)
         hbox4.pack_end(self.checkbutton1, False, False, 60)
+        self.checkbutton1.set_sensitive(False)
         self.checkbutton1.show()###
         
         hbox5 = gtk.HBox(False, 0)
@@ -260,7 +262,7 @@ class GUI(gtk.Window):
  
         self.entry2 = gtk.Entry()
         self.entry2.set_size_request(202, 20)
-        self.entry2.set_text(table)
+        self.entry2.set_text("QueryResult.shp")
         hbox5.pack_start(self.entry2, False, False, 0)
         self.entry2.show()###
         
@@ -363,12 +365,15 @@ class GUI(gtk.Window):
         
     def get_records(self, widget, treeview):
         sample = widget.get_label() == "Get Sample"
+        #get 10 sample reocrds
         if sample:
             records, isstring = get_records(self.selected_feature, 10)
+        #get all records
         else: 
             records, isstring = get_records(self.selected_feature, -1)
         treeview.set_model(self.create_model(records, False, isstring))
         
+    #clear SQL where expression text box
     def clear(self, widget):
         textbuffer = self.textview.get_buffer()
         textbuffer.set_text("")
@@ -378,50 +383,55 @@ class GUI(gtk.Window):
         gtk.main_quit()
         return False
         
+    #test number of rows after SQL where expression applied
     def test_value(self, widget):
         textbuffer = self.textview.get_buffer()
         start = textbuffer.get_start_iter()
         end = textbuffer.get_end_iter()
         statement = textbuffer.get_text(start, end)
         
+        #for the case that where statement is empty
         if statement.replace(" ", "") == "":
-            sql = "SELECT gid FROM %s " % table
+            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query "
+        #for the case that something input in SQL where expression textbox
         else:
-            sql = "SELECT gid FROM %s where %s" % (table, statement)
+            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query WHERE %s" % (statement)
 
-        buffer = self.entry1.get_text().replace(" ", "").split(",")
-        f_list = []
-        if self.entry1.get_text().replace(" ", "") != "":
-            for element in buffer:
-                if len(str(element).split("-")) == 2:
-                    for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
-                        f_list.append(f)
-                else:
-                    f_list.append(int(element))
-            f_list.sort()
-            tmp = ""
-            for i in range(len(f_list)):
-                if i == 0:
-                    tmp += "%s = %d " % (split_field, f_list[i])
-                else:
-                    tmp += "OR %s = %d " % (split_field, f_list[i])
-
-            if "where" not in sql:
-                sql += "WHERE (" + tmp + ")"
-            else:
-                sql += "AND (" + tmp + ")"
+        #split results with date/year, but now is not available
+        #buffer = self.entry1.get_text().replace(" ", "").split(",")
+        #f_list = []
+        #if self.entry1.get_text().replace(" ", "") != "":
+        #    for element in buffer:
+        #        if len(str(element).split("-")) == 2:
+        #            for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
+        #                f_list.append(f)
+        #        else:
+        #            f_list.append(int(element))
+        #    f_list.sort()
+        #    tmp = ""
+        #    for i in range(len(f_list)):
+        #        if i == 0:
+        #            tmp += "%s = %d " % (split_field, f_list[i])
+        #        else:
+        #            tmp += "OR %s = %d " % (split_field, f_list[i])
+        #
+        #    if "WHERE" not in sql:
+        #        sql += "WHERE (" + tmp + ")"
+        #    else:
+        #        sql += "AND (" + tmp + ")"
 
         sql = sql.decode("utf-8")
         try:
             con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
             cur = con.cursor()
             cur.execute(sql)
-            results = cur.fetchall()
+            numrow = cur.fetchall()[0]
             messagedialog = gtk.MessageDialog(self, 
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
-                gtk.BUTTONS_CLOSE, "The where clause returned %d row(s)" % len(results))          
+                gtk.BUTTONS_CLOSE, "The where clause returned %d row(s)" % numrow)          
         
         except psycopg2.DatabaseError, e:
+            print sql
             messagedialog = gtk.MessageDialog(self, 
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
                 gtk.BUTTONS_CLOSE, "An error occurred when executing the query.")
@@ -443,85 +453,104 @@ class GUI(gtk.Window):
             outshp = self.entry2.get_text().replace(" ", "").encode("big5")
         
         statement = textbuffer.get_text(start, end)
+        
+        #for the case that where statement is empty
         if statement.replace(" ", "") == "":
-            sql = "select * from %s " % table
+            sql = "SELECT * FROM tmp_query "
+        #for the case that something input in SQL where expression textbox
         else:
-            sql = "select * from %s where %s" % (table, statement)
+            sql = "SELECT * FROM tmp_query WHERE %s" % statement
             
-        buffer = self.entry1.get_text().replace(" ", "").split(",")
-        f_list = []
-        for element in buffer:
-            if len(str(element).split("-")) == 2:
-                for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
-                    f_list.append(f)
-            else:
-                if element != "":
-                    f_list.append(int(element))
-        f_list.sort()
+        #split results with date/year, but now is not available
+        #buffer = self.entry1.get_text().replace(" ", "").split(",")
+        #f_list = []
+        #for element in buffer:
+        #    if len(str(element).split("-")) == 2:
+        #        for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
+        #            f_list.append(f)
+        #    else:
+        #        if element != "":
+        #            f_list.append(int(element))
+        #f_list.sort()
         
-        if len(f_list) == 0:
-            cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
-            result = os.popen(cmdStr).read()
-            count += 1
-            log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
-            log.write(cmdStr + "\n")
-            log.write(result + "\n")
-            if "ERROR" in result or "Failed" in result:
-                    count -= 1
-                    try:
-                        dllist = glob.glob(outshp + "*")
-                        for file in dllist:
-                            os.remove(file)
-                    except:
-                        print "Can't remove error files!"
-        
-        else:
-            if self.checkbutton1.get_active():
-                for f in f_list:
-                    if "where" not in sql:
-                        tmpsql = sql + "where %s = %d " % (split_field, f)
-                    else:
-                        tmpsql = sql + " AND %s = %d" % (split_field, f)
-                    cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, passwords, dbname, tmpsql.encode("big5")) 
-                    result = os.popen(cmdStr).read()
-                    count += 1
-                    log.write("Generating shapefile %s...\n" % (outshp + str(f) + ".shp"))
-                    log.write(cmdStr + "\n")
-                    log.write(result + "\n")
-                    if "ERROR" in result or "Failed" in result:
-                        count -= 1
-                        try:
-                            dllist = glob.glob(outshp + str(f) + "*")
-                            for file in dllist:
-                                os.remove(file)
-                        except:
-                            print "Can't remove error files!"
+        #if len(f_list) == 0:
+        #    cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        #    result = os.popen(cmdStr).read()
+        #    count += 1
+        #    log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
+        #    log.write(cmdStr + "\n")
+        #    log.write(result + "\n")
+        #    if "ERROR" in result or "Failed" in result:
+        #            count -= 1
+        #            try:
+        #                dllist = glob.glob(outshp + "*")
+        #                for file in dllist:
+        #                    os.remove(file)
+        #            except:
+        #                print "Can't remove error files!"
+        #
+        #else:
+        #    if self.checkbutton1.get_active():
+        #        for f in f_list:
+        #            if "where" not in sql:
+        #                tmpsql = sql + "where %s = %d " % (split_field, f)
+        #            else:
+        #                tmpsql = sql + " AND %s = %d" % (split_field, f)
+        #            cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, passwords, dbname, tmpsql.encode("big5")) 
+        #            result = os.popen(cmdStr).read()
+        #            count += 1
+        #            log.write("Generating shapefile %s...\n" % (outshp + str(f) + ".shp"))
+        #            log.write(cmdStr + "\n")
+        #            log.write(result + "\n")
+        #            if "ERROR" in result or "Failed" in result:
+        #                count -= 1
+        #                try:
+        #                    dllist = glob.glob(outshp + str(f) + "*")
+        #                    for file in dllist:
+        #                        os.remove(file)
+        #                except:
+        #                    print "Can't remove error files!"
+        #        
+        #    else:
+        #        tmp = ""
+        #        for i in range(len(f_list)):
+        #            if i == 0:
+        #                tmp += "%s = %d " % (split_field, f_list[i])
+        #            else:
+        #                tmp += "OR %s = %d " % (split_field, f_list[i])
+        #        if tmp != "":
+        #            if "where" not in sql:
+        #                sql += "where (" + tmp + ")"
+        #            else:
+        #                sql += "AND (" + tmp + ")"
+        #            
+        #        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        #        result = os.popen(cmdStr).read()
+        #        count += 1
+        #        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
+        #        log.write(cmdStr + "\n")
+        #        log.write(result + "\n")
+        #        if "ERROR" in result or "Failed" in result:
+        #            count -= 1
                 
-            else:
-                tmp = ""
-                for i in range(len(f_list)):
-                    if i == 0:
-                        tmp += "%s = %d " % (split_field, f_list[i])
-                    else:
-                        tmp += "OR %s = %d " % (split_field, f_list[i])
-                if tmp != "":
-                    if "where" not in sql:
-                        sql += "where (" + tmp + ")"
-                    else:
-                        sql += "AND (" + tmp + ")"
-                    
-                cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
-                result = os.popen(cmdStr).read()
-                count += 1
-                log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
-                log.write(cmdStr + "\n")
-                log.write(result + "\n")
-                if "ERROR" in result or "Failed" in result:
-                    count -= 1
+        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        result = os.popen(cmdStr).read()
+        count += 1
+        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
+        log.write(cmdStr + "\n")
+        log.write(result + "\n")
+        if "ERROR" in result or "Failed" in result:
+                count -= 1
+                try:
+                    dllist = glob.glob(outshp + "*")
+                    for file in dllist:
+                        os.remove(file)
+                except:
+                    print "Can't remove error files!"
                 
         messagedialog = gtk.MessageDialog(self, 
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
-                gtk.BUTTONS_CLOSE, '%d shapefile(s) have been generated.\n\nCheck the log file "log.txt" in output directory for more information.' % count)
+                gtk.BUTTONS_CLOSE, '1 shapefile have been generated.\n\nCheck the log file "log.txt" in output directory for more information.')
                 
         log.close()
         messagedialog.set_position(gtk.WIN_POS_CENTER)
@@ -536,7 +565,19 @@ def create_field_list():
     try:
         con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
         cur = con.cursor()
-        sql = "SELECT COLUMN_NAME FROM Information_Schema.COLUMNS WHERE TABLE_NAME = '%s' ORDER BY ORDINAL_POSITION" % table
+        sql = """
+              DROP VIEW IF EXISTS tmp_query;
+              CREATE VIEW tmp_query AS
+              SELECT *
+              FROM (SELECT slide_id, project_name AS project, replace(replace(array_agg(image_name)::text, '{', ''), '}', '') AS image_name, image_date::text, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y, geom
+                    FROM slide_area, image, project, admin_area, working_circle, reservoir, watershed, forest_district, basin
+                    WHERE image_no = image_name AND project_no = project_id AND county_no = county_id AND town_no = town_id AND workingcircle_no = workingcircle_id AND reservoir_no = reservoir_id AND water_no = water_id AND forest_no = forest_id AND basin_no = basin_id
+                    GROUP BY slide_id, geom, project_name, image_date, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y) AS T
+        """
+        cur.execute(sql)
+        con.commit()
+        
+        sql = "SELECT COLUMN_NAME FROM Information_Schema.COLUMNS WHERE TABLE_NAME = 'tmp_query' ORDER BY ORDINAL_POSITION"
         cur.execute(sql)
         
     except psycopg2.DatabaseError, e:
@@ -552,7 +593,7 @@ def get_records(fieldname, num):
     try:
         con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
         cur = con.cursor()
-        sql = "SELECT DISTINCT %s FROM %s WHERE %s IS NOT NULL" % (fieldname, table, fieldname)
+        sql = "SELECT DISTINCT %s FROM tmp_query WHERE %s IS NOT NULL" % (fieldname, fieldname)
         cur.execute(sql)
         
     except psycopg2.DatabaseError, e:
@@ -564,7 +605,7 @@ def get_records(fieldname, num):
         return [[], False]
 
     if num == 10:
-        if isinstance(result[0][0], str) or isinstance(result[0][0], unicode):
+        if isinstance(result[0][0], str) or isinstance(result[0][0], unicode) or isinstance(result[0][0], unicode):
             result = [row[0].decode("big5") for row in result][:10]
             result.sort()
             return [result, True]
@@ -602,13 +643,12 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword\ntable=result\ndatefield=DMCDATE")
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword\ndatefield=DMCDATE")
         settings.close()
         host = "localhost"
         dbname = "gis"
         user = "postgres"
         passwords = "mypassword"
-        table = "result"
         datefield = "DMCDATE"
         settings.close()
     else:
@@ -618,8 +658,7 @@ if __name__ == '__main__':
         dbname = lines[1].split("=")[-1].replace("\n", "")
         user = lines[2].split("=")[-1].replace("\n", "")
         passwords = lines[3].split("=")[-1].replace("\n", "")
-        table = lines[4].split("=")[-1].replace("\n", "")
-        split_field = lines[5].split("=")[-1].replace("\n", "")
+        split_field = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     
     if isDefault:
@@ -627,4 +666,4 @@ if __name__ == '__main__':
     else:
         GUI(os.path.join(root, "output"))
 
-    main()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    main()

@@ -343,9 +343,6 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             conn.commit()
             
             sql = """
-                    SELECT ST_AsText(ST_Envelope(geom))
-                    FROM inputdata;"""
-            sql = """
                     SELECT MAX(ST_X(geom)), MIN(ST_X(geom)), MAX(ST_Y(geom)), MIN(ST_Y(geom))
                     FROM TP
                     GROUP BY rid
@@ -410,9 +407,6 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             cur.execute(sql)
             conn.commit()
             
-            sql = """
-                    SELECT ST_AsText(ST_Envelope(geom))
-                    FROM inputdata;"""
             sql = """
                     SELECT MAX(ST_X(geom)) - MIN(ST_X(geom)), MAX(ST_Y(geom)) - MIN(ST_Y(geom))
                     FROM TP

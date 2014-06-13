@@ -40,3 +40,8 @@ This program is a toolbox written for the following functions:
 -----------2014-06-09 17:05-----------
 1.Analysis: Change rasterizing pixel size from 1mx1m to 5mx5m.
 -----------2014-06-09 17:05-----------
+
+-----------2014-06-13 16:48-----------
+1.Analysis: Delete meaningless statement.
+2.Export: Add support of database having new structure.Disable function of split query result with date/year column.
+-----------2014-06-13 16:48-----------
