@@ -18,14 +18,28 @@ class GUI(gtk.Window):
     def __init__(self, outputdir = os.path.join(os.getcwd(), "output")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.connect("delete_event", self.close_application)
-        window.set_size_request(700, 720)
+        window.set_size_request(700, 745)
         window.set_position(gtk.WIN_POS_CENTER)
         window.set_title("Export Gtk")
         window.show()
         
+    ##menu bar
+        self.menu_items = (
+            ('/_File', None, None, 0, '<Branch>'),
+            ('/File/_Config Settings', '<control>P', self.setconfig, 0, None),
+            ('/File/sep1', None, None, 0,'<Separator>'),
+            ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
+            ('/_Help', None, None, 0,'<LastBranch>'),
+            ('/Help/About', None, None, 0, None)        
+        )
+        
         mainbox = gtk.VBox(False, 10)
         mainbox.show()###
         window.add(mainbox)
+        
+        menubar = self.get_main_menu(window)
+        mainbox.pack_start(menubar, False, True, 0)
+        menubar.show()
         
         hbox1 = gtk.HBox(True, 10)
         hbox1.show()###
@@ -319,6 +333,23 @@ class GUI(gtk.Window):
             os.mkdir(self.outputdir)
         os.chdir(self.outputdir)
         
+    def setconfig(self, tag, widget):
+        cur = os.getcwd()
+        os.chdir(exportpath) 
+        if len(sys.argv) > 1:
+           result = os.popen("python conf.py 1")
+        else:
+           result = os.popen("python conf.py")
+        os.chdir(cur)
+        
+    def get_main_menu(self, window):
+        accel_group = gtk.AccelGroup()
+        item_factory = gtk.ItemFactory(gtk.MenuBar, '<main>', accel_group)
+        item_factory.create_items(self.menu_items)
+        window.add_accel_group(accel_group)
+        self.item_factory = item_factory
+        return item_factory.get_widget('<main>')
+        
     def create_model(self, list, isfields = False, isstring = False):
         store = gtk.ListStore(str)
         if isfields:
@@ -434,7 +465,7 @@ class GUI(gtk.Window):
 
         sql = sql.decode("utf-8")
         try:
-            con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
+            con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
             cur = con.cursor()
             cur.execute(sql)
             numrow = cur.fetchall()[0]
@@ -486,7 +517,7 @@ class GUI(gtk.Window):
         #f_list.sort()
         
         #if len(f_list) == 0:
-        #    cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        #    cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
         #    result = os.popen(cmdStr).read()
         #    count += 1
         #    log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -508,7 +539,7 @@ class GUI(gtk.Window):
         #                tmpsql = sql + "where %s = %d " % (split_field, f)
         #            else:
         #                tmpsql = sql + " AND %s = %d" % (split_field, f)
-        #            cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, passwords, dbname, tmpsql.encode("big5")) 
+        #            cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, password, dbname, tmpsql.encode("big5")) 
         #            result = os.popen(cmdStr).read()
         #            count += 1
         #            log.write("Generating shapefile %s...\n" % (outshp + str(f) + ".shp"))
@@ -536,7 +567,7 @@ class GUI(gtk.Window):
         #            else:
         #                sql += "AND (" + tmp + ")"
         #            
-        #        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        #        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
         #        result = os.popen(cmdStr).read()
         #        count += 1
         #        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -545,7 +576,7 @@ class GUI(gtk.Window):
         #        if "ERROR" in result or "Failed" in result:
         #            count -= 1
                 
-        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, passwords, dbname, sql.encode("big5")) 
+        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
         result = os.popen(cmdStr).read()
         count += 1
         log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -575,7 +606,7 @@ class GUI(gtk.Window):
         
 def create_field_list():
     try:
-        con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
+        con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
         cur = con.cursor()
         sql = """
               DROP VIEW IF EXISTS tmp_query;
@@ -603,7 +634,7 @@ def create_field_list():
 
 def get_records(fieldname, num):
     try:
-        con = psycopg2.connect(database = dbname, user = user, password = passwords, host = host)
+        con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
         cur = con.cursor()
         sql = "SELECT DISTINCT %s FROM tmp_query WHERE %s IS NOT NULL" % (fieldname, fieldname)
         cur.execute(sql)
@@ -641,26 +672,26 @@ def main():
     return 0
 
 if __name__ == '__main__':
-    erportpath = os.getcwd()
+    exportpath = os.getcwd()
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
         isDefault = False
-        if not os.path.exists(os.path.join(erportpath, "..", "conf")):
-            os.mkdir(os.path.join(erportpath, "..", "conf"))
-        configpath = os.path.join(erportpath, "..", "conf", "Export.ini")
+        if not os.path.exists(os.path.join(exportpath, "..", "conf")):
+            os.mkdir(os.path.join(exportpath, "..", "conf"))
+        configpath = os.path.join(exportpath, "..", "conf", "Export.ini")
     else:
         root = os.getcwd()
         isDefault = True
-        configpath = os.path.join(erportpath, "Export.ini")
+        configpath = os.path.join(exportpath, "Export.ini")
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npasswords=mypassword\ndatefield=DMCDATE")
+        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npassword=mypassword\ndatefield=DMCDATE")
         settings.close()
         host = "localhost"
         dbname = "landslide"
         user = "postgres"
-        passwords = "mypassword"
+        password = "mypassword"
         split_field = "DMCDATE"
         settings.close()
     else:
@@ -669,7 +700,7 @@ if __name__ == '__main__':
         host = lines[0].split("=")[-1].replace("\n", "")
         dbname = lines[1].split("=")[-1].replace("\n", "")
         user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        password = lines[3].split("=")[-1].replace("\n", "")
         split_field = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     

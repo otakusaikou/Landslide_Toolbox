@@ -29,6 +29,7 @@ class GUI:
         self.menu_items = (
             ('/_File', None, None, 0, '<Branch>'),
             ('/File/_Reset', '<control>R', self.reset, 0, None),
+            ('/File/_Config Settings', '<control>P', self.setconfig, 0, None),
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
@@ -161,6 +162,15 @@ class GUI:
         
         button.show()
         hbox.show()
+        
+    def setconfig(self, tag, widget):
+        cur = os.getcwd()
+        os.chdir(zonpath) 
+        if len(sys.argv) > 1:
+           result = os.popen("python conf.py 1")
+        else:
+           result = os.popen("python conf.py")
+        os.chdir(cur)
         
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()

@@ -57,7 +57,31 @@ class ToolBox:
         gtk.main_quit()
         
     def config_menu(self, widget, data):
-        print "HelloWorld!"
+        label = data.get_label()
+        if label == "Upload":
+            os.chdir(os.path.join(root, "bin", "Upload"))
+            os.popen("python conf.py 1")
+            os.chdir(root)
+        elif label == "Analysis":
+            os.chdir(os.path.join(root, "bin", "Landslide_postgis"))
+            os.popen("python conf.py 1")
+            os.chdir(root)
+        elif label == "Merge":
+            os.chdir(os.path.join(root, "bin", "Merge"))
+            os.popen("python conf.py 1")
+            os.chdir(root)
+        elif label == "Zonal Split":
+            os.chdir(os.path.join(root, "bin", "Zonal_Split"))
+            os.popen("python conf.py 1")
+            os.chdir(root)
+        elif label == "_Quit":
+            try:
+                for p in self.subproc:
+                    p.terminate()
+            except:
+                pass
+            gtk.main_quit()
+            
         
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()
@@ -79,14 +103,14 @@ class ToolBox:
         
         self.menu_items = (
             ('/_File', None, None, 0, '<Branch>'),
-            ('/File/Config/Toolbox', None, self.config_menu, 0, None),
+            #('/File/Config/Toolbox', None, self.config_menu, 0, None),
             ('/File/Config/Upload', None, self.config_menu, 0, None),
             ('/File/Config/Export', None, self.config_menu, 0, None),
             ('/File/Config/Analysis', None, self.config_menu, 0, None),
             ('/File/Config/Merge', None, self.config_menu, 0, None),
             ('/File/Config/Zonal Split', None, self.config_menu, 0, None),
             ('/File/sep1', None, None, 0,'<Separator>'),
-            ('/File/_Quit', '<control>Q', self.close_button_event, 0, None),
+            ('/File/_Quit', '<control>Q', self.config_menu, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
             ('/Help/About', None, None, 0, None)        
         )

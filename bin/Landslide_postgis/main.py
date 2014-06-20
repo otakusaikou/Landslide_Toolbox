@@ -24,7 +24,16 @@ class GUI:
     def reset(self, tag, widget):
         self.button1.set_current_folder(self.inputdir)
         self.button2.set_current_folder(self.outputdir)
-        
+    
+    def setconfig(self, tag, widget):
+        cur = os.getcwd()
+        os.chdir(analysispath) 
+        if len(sys.argv) > 1:
+           result = os.popen("python conf.py 1")
+        else:
+           result = os.popen("python conf.py")
+        os.chdir(cur)
+ 
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Landslide_processor.py')
@@ -37,6 +46,7 @@ class GUI:
         self.menu_items = (
             ('/_File', None, None, 0, '<Branch>'),
             ('/File/_Reset', '<control>R', self.reset, 0, None),
+            ('/File/_Config Settings', '<control>P', self.setconfig, 0, None),
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
@@ -81,8 +91,6 @@ class GUI:
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
         
-        hbox.show()
-        hsaparator.show()
     
     ##dem layer 
         self.label2 = gtk.Label("The dem layer path...")
@@ -90,8 +98,6 @@ class GUI:
         mainbox.pack_start(hbox, True, False, 0)
         hbox.pack_start(self.label2, False, True, 5)  
         
-        self.label2.show()
-        hbox.show() 
           
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
@@ -107,9 +113,6 @@ class GUI:
         self.button2.set_filter(filter)
         hbox.pack_start(self.button2, True, True, 0)
         
-        hbox.show()
-        self.button2.show()
-    
     ##separator
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
@@ -118,18 +121,12 @@ class GUI:
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
         
-        hbox.show()
-        hsaparator.show()
-    
     ##slope layer 
         self.label3 = gtk.Label("The slope layer path...")
         hbox = gtk.HBox(False, 5)
         mainbox.pack_start(hbox, True, False, 0)
         hbox.pack_start(self.label3, False, True, 5)  
         
-        self.label3.show()
-        hbox.show() 
-          
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 0)
@@ -143,10 +140,6 @@ class GUI:
         self.overwriteBtn1 = gtk.CheckButton("Overwrite Old Table")
         self.overwriteBtn1.set_active(False)
         hbox.pack_start(self.overwriteBtn1, False, False, 10)
-        self.overwriteBtn1.show()
-        
-        hbox.show()
-        self.button3.show()
         
     ##separator
         hbox = gtk.HBox(False, 0)
@@ -156,18 +149,12 @@ class GUI:
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
         
-        hbox.show()
-        hsaparator.show()
-
     ##aspect layer 
         self.label4 = gtk.Label("The aspect layer path...")
         hbox = gtk.HBox(False, 5)
         mainbox.pack_start(hbox, True, False, 0)
         hbox.pack_start(self.label4, False, True, 5)  
         
-        self.label4.show()
-        hbox.show() 
-          
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 0)
@@ -181,10 +168,6 @@ class GUI:
         self.overwriteBtn2 = gtk.CheckButton("Overwrite Old Table")
         self.overwriteBtn2.set_active(False)
         hbox.pack_start(self.overwriteBtn2, False, False, 10)
-        self.overwriteBtn2.show()
-
-        hbox.show()
-        self.button4.show()
         
     ##separator
         hbox = gtk.HBox(False, 0)
@@ -194,9 +177,6 @@ class GUI:
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
         
-        hbox.show()
-        hsaparator.show()
-
     ##output directory path
         self.label5 = gtk.Label("The output directory path...")
         hbox = gtk.HBox(False, 5)
@@ -215,7 +195,7 @@ class GUI:
     ##analyze button box
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
-        mainbox.pack_start(hbox, True, False, 5)
+        mainbox.pack_start(hbox, True, False, 10)
 
         button = gtk.Button('Analyze')
         button.connect('clicked', self.transform)
@@ -356,9 +336,6 @@ class Analysis:
         
         return "Works done! It took %f sec" % (tEnd - tStart), result, True, gtk.MESSAGE_INFO
     
-    
-            
-        
             
 def main():
     gtk.main()
@@ -398,8 +375,7 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
-        settings.close()
+        settings.write("host=localhost\ndbname=gis\nuser=postgres\npassword=mypassword")
         host = "localhost"
         database = "gis"
         user = "postgres"
