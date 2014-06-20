@@ -49,3 +49,8 @@ This program is a toolbox written for the following functions:
 -----------2014-06-13 17:08-----------
 1.Export: Bug in connecting to database fixed.
 -----------2014-06-13 17:08-----------
+
+-----------2014-06-21 01:05-----------
+1.Add GUI of config settings for all programs.
+-----------2014-06-21 01:05-----------
+
