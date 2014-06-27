@@ -65,4 +65,5 @@ This program is a toolbox written for the following functions:
 1.Analysis: Add message for skipped shapefile names which have no landslide and riverside.
 2.Merge: Algorithm modified for new database structure. Remove handling for image name.
 3.Zonal: Algorithm modified for new database structure. Remove handling for image name.
+4.Export: Add support of database having new structure.
 -----------2014-06-28 03:20-----------
