@@ -248,6 +248,7 @@ class GUI:
 
         flag = not self.doTransOnly.get_active()
         #check if the slope raster file is valid
+        #flag means that the program will do both coordinate transformation and analysis
         if not self.button3.get_filename() and flag:
             self.showMessage("Can't find any valid slope raster file.", None, False, gtk.MESSAGE_WARNING)
             return
@@ -301,9 +302,7 @@ class Analysis:
             
     def transform(self, shp_list, overwriteSlope, overwriteAspect, flag):
         tStart = time.time()
-        
         result = ""
-        
         #connect to database
         try:
             conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (database, user, host, password))
@@ -347,6 +346,7 @@ class Analysis:
             result += result2
             
         else:
+            #coordinate transformation
             result += img2map(shp_list, self.inputdir, self.outputdir, self.demlayer, flag)
         
             
@@ -361,6 +361,7 @@ def main():
 
 if __name__ == '__main__':
     analysispath = os.getcwd()
+    #opened by Toolbox
     if len(sys.argv) > 1:
         root = os.path.dirname(os.path.dirname(os.getcwd()))
         if not os.path.exists(os.path.join(analysispath, "..", "conf")):
@@ -376,6 +377,7 @@ if __name__ == '__main__':
             os.mkdir(outputdir)
 
         GUI(inputdir, outputdir)
+    #opened directly
     else:
         root = os.getcwd()
         configpath = os.path.join(analysispath, "Analysis.ini")

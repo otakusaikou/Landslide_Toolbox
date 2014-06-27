@@ -53,7 +53,6 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
     records = sf.records()
     fields.insert(2, ['DMCDate', 'D'])
     fields.insert(2, ['Project', 'C', 10, 0])
-    fields.insert(2, ['DMCName', 'C', 20, 0])
 
     shpOut = shapefile.Writer(shapefile.POLYGON)
     
@@ -86,26 +85,19 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
     
     for shp in shapes:
         parts = shp.parts
-        #print "parts: ", parts
         numParts = len(parts)
         numPoints = len(shp.points)
         
-        #print int(100.0 * nShape / len(shapes)), iter
         if int(65.0 * nShape / len(shapes)) > iter:
             iter = int(65.0 * nShape / len(shapes))
             sys.stdout.write("=" * iter + " " * (65 - iter) + "]  %3d%%" % int(iter * 100 / 65))
             sys.stdout.flush()
             sys.stdout.write("\b" * 72)
             
-        #print "shape %d, number of parts: %d " % (nShape+1, numParts) ,
-        #print "number of points: ", numPoints
 
         partsOut = []
         
         for i in range(numParts):
-            #print "point %s: " % (i+1),
-            #print shp.points[i]
-            
             indexStart = parts[i]
             if i == numParts - 1:
                 indexEnd = numPoints
@@ -117,22 +109,14 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
                 count = 0
                 z0 = meanElev
                 imgX = (shp.points[j][0] - ioA0) / ioA1
-                #imgY = (shp.points[j][1] - ioB0) / ioB2
                 imgY = (dmcRows - shp.points[j][1] - ioB0) / ioB2
-                #print 'imgX, imgY = ', imgX, imgY
                 
                 while True:
                     x, y = imgToWorld(imgX, imgY, z0, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, focalLength)
-                    #print 'x, y, z0 = ', x, y, z0
-                    
                     z = readimg.getElev(data, metadatainf, x, y)
-                    #print 'x, y, z = ', x, y, z
-                    
                     if abs(z - z0) <= threshold:
-                        #print 'OK'
                         break
                     elif count == 20:
-                        #print 'iterations over 20'
                         break
                     else:
                         z0 = z
@@ -145,7 +129,6 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
         shpOut.poly(partsOut)
         records[nShape].insert(1, date)
         records[nShape].insert(1, fileName.replace("~", "_")[0:11])
-        records[nShape].insert(1, os.path.splitext(fileName.replace("~", "_"))[-2])
         rec = records[nShape]
         
         shpOut.record(*rec)
@@ -441,6 +424,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
 #---------landslide_analysis---------
 #---------extract_origin---------
 def get_landslide(inputdir, outputdir, flag):
+    #this function split landslide and unclassified polygon into two shapefiles
     root = os.getcwd()
     os.chdir(os.path.join(inputdir))
     shp_list = glob.glob("*.shp")
@@ -512,6 +496,7 @@ def get_landslide(inputdir, outputdir, flag):
         landslideShp.save(os.path.join(outputdir, "Landslide", imageFile))
 
 def extract_origin(inputdir, outputdir):
+    #this function find landslide in TWD97 CRS, and link it to image CRS, finally extract it out
     count = 1
     origin = os.getcwd()
     os.chdir(inputdir)
@@ -570,7 +555,6 @@ def extract_origin(inputdir, outputdir):
 
                 partsOut.append(polyOut)
                 
-                
             # Filter original shapefile with field 'Shp_id'
             if records2[nShape][1] in output_list:
                 landslideShp.poly(partsOut)
@@ -582,7 +566,6 @@ def extract_origin(inputdir, outputdir):
             allShp.poly(partsOut)
             allShp.record(*records2[nShape])
                 
-            
             nShape += 1
         
         #save two shapefile, one has all polygon, and the other has only polygon whose 'class_name' is 'landslide'
@@ -592,17 +575,17 @@ def extract_origin(inputdir, outputdir):
         print "Transformation of shapefile '%s' succeed!....(%d / %d)" % (shpfile, count, len(shp_list))
         result += "Transformation of shapefile '%s' succeed!....(%d / %d)\n" % (shpfile, count, len(shp_list))
         count += 1
+    if len(skipped_list) != 0:
+        result += "Because having no landslide or riverside, the following %s shapefile(s) have no output result: %s\n" % (len(skipped_list), ", ".join(skipped_list))
+        print "Because having no landslide or riverside, the following %s shapefile(s) have no output result: %s" % (len(skipped_list), ", ".join(skipped_list))
     result += "The filtering of all original shapefiles has finished!\n"
     print "The filtering of all original shapefiles has finished!"
+    global skipped_list 
+    skipped_list = []
+
     return "The filtering of all original shapefiles has finished!", result, True, False
     
-    
-
-
-
 def main():
-    pass
-
     return 0
     
 if __name__ == "__main__":

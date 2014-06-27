@@ -276,22 +276,6 @@ class Merge:
         if not os.path.exists(outputdir):
             os.mkdir(outputdir)
             
-    def toArray(self, tablename, cur, conn):
-        #convert attribute dmcname to text array
-        cur.execute("SELECT gid, dmcname FROM %s" % tablename)
-        ans = cur.fetchall()
-        sql = "DROP TABLE IF EXISTS %sa;CREATE TABLE %sa AS TABLE %s;ALTER TABLE %sa ALTER COLUMN dmcname TYPE text[] USING ARRAY[project];ALTER TABLE %sa ALTER COLUMN dmcdate TYPE date USING dmcdate::date;\n" % (tablename, tablename, tablename, tablename, tablename)
-        for row in ans:
-            if "{" in row[1]:
-                tmp = row[1].replace("{", "").replace("}", "").split(",")
-                tmp.sort()
-                sql += ("UPDATE %sa SET dmcname = '{" % tablename) + ",".join(tmp) + "}' WHERE gid = %s;\n" % row[0]
-            else:
-                sql += ("UPDATE %sa SET dmcname = '{" % tablename) + row[1] + "}' WHERE gid = %s;\n" % row[0]
-        sql += "DROP TABLE IF EXISTS %s;ALTER TABLE %sa RENAME TO %s" % (tablename, tablename, tablename)
-        cur.execute(sql)
-        conn.commit()
-    
     def uploadshp(self, shp_data, cur, conn):
         #delete old table
         cur.execute("DROP TABLE IF EXISTS t1;")
@@ -301,8 +285,6 @@ class Merge:
         print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
         result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
         result = os.popen(cmdstr).read()
-        
-        self.toArray("t1", cur, conn)
         
         return result
         
@@ -330,23 +312,13 @@ class Merge:
                 conn.rollback()
             #change the ST_buffer tolerance
             threshold *= 10
-            
 
-        #get intersetion attribute from t1 and unishp table
-        cur.execute("SELECT U.gid AS gid, array_agg(t1.dmcname::text) AS dmcname, MAX(t1.project) AS project, MAX(t1.dmcdate) AS dmcdate, U.gid as ugid FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid;")
+        #get intersetion attributes from t1 and unishp table
+        cur.execute("SELECT U.gid AS gid, t1.project AS project, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.project, t1.dmcdate;")
         ans = cur.fetchall()
-        dmcname = []
-        for row in ans:
-            photos = []
-            for photostr in row[1]:
-                for photo in photostr.replace("{", "").replace("}", "").replace("'", "").split(","):
-                    if photo not in photos:
-                        photos.append(photo)
-            photos.sort()
-            dmcname.append(photos)
-        sql = "ALTER TABLE unishp ADD COLUMN dmcname text[]; ALTER TABLE unishp ADD COLUMN project text; ALTER TABLE unishp ADD COLUMN dmcdate date;"
-        for i in range(len(dmcname)):
-            sql += "UPDATE unishp SET (dmcname, project, dmcdate) = ('{" + ",".join(dmcname[i]) + "}', '%s', '%s'\n) WHERE gid = %d;\n" % (ans[i][2], str(ans[i][3]), ans[i][0])
+        sql = "ALTER TABLE unishp ADD COLUMN project text; ALTER TABLE unishp ADD COLUMN dmcdate date;"
+        for i in range(len(ans)):
+            sql += "UPDATE unishp SET (project, dmcdate) = ('%s', '%s'\n) WHERE gid = %d;\n" % (ans[i][1], str(ans[i][2]), ans[i][0])
         cur.execute(sql)
         conn.commit()
         
@@ -389,7 +361,6 @@ class Merge:
                 print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                 result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                 result += os.popen(cmdstr).read()
-                self.toArray("t1", cur, conn)
                 #Dissolve shapefile
                 print "Dissolve shapefile '%s'..." % shp_data
                 result += "Dissolve shapefile '%s'...\n" % shp_data
@@ -398,7 +369,7 @@ class Merge:
                 #export result
                 try:
                     os.chdir(self.outputdir)
-                    cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, dmcname, project, dmcdate FROM t1 ORDER BY gid"' % (shp_data, host, user, dbname)
+                    cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (shp_data, host, user, dbname)
                     print "Export dissolved shapefile '%s'..." % shp_data
                     result += "Export dissolved shapefile '%s'...\n" % shp_data
                     result += os.popen(cmdstr).read()
@@ -473,14 +444,12 @@ class Merge:
             print "Import shapefile '%s' to database '%s'..." % (shp_list[0], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[0], dbname)
             result += os.popen(cmdstr).read()
-            self.toArray("t1", cur, conn)
             
             #upload t2
             cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_list[1], dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[1], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
-            self.toArray("t2", cur, conn)
 
             result += "Create union with shapefiles '%s' and '%s'...\n" % (shp_list[0], shp_list[1]) 
             print "Create union with shapefiles '%s' and '%s'..." % (shp_list[0], shp_list[1])
@@ -505,7 +474,6 @@ class Merge:
                     print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                     result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                     result += os.popen(cmdstr).read()
-                    self.toArray("t2", cur, conn)
                     result += "Create union with shapefile '%s'...\n" % shp_data 
                     print "Create union with shapefile '%s'..." % shp_data
                     cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
@@ -513,6 +481,14 @@ class Merge:
                 except:
                     #delete template tables
                     conn.rollback()
+                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_data, dbname, user)
+                    print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
+                    result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
+                    result += os.popen(cmdstr).read()
+                    result += "Create union with shapefile '%s'...\n" % shp_data 
+                    print "Create union with shapefile '%s'..." % shp_data
+                    cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
+                    conn.commit()
                     cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
                     conn.commit()
                     conn.close()
@@ -527,7 +503,7 @@ class Merge:
         #export result
         try:
             os.chdir(self.outputdir)
-            cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, dmcname, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, user, dbname)
+            cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, user, dbname)
             print "Export merged landslide..."
             result += "Export merged landslide...\n"
             result += os.popen(cmdstr).read()

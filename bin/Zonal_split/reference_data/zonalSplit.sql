@@ -68,7 +68,7 @@ UPDATE MP_WC_F_C_T_R_W_B SET Basin_id = '_', Basin = '_' WHERE Basin IS NULL;
 /*Join merged and County*/
 DROP TABLE IF EXISTS merged2;
 CREATE TABLE merged2 AS
-SELECT M.geom, M.GEOM_ID, M.project, M.dmcname, M.dmcdate, Working_id, Working_ci, Forest_id, Forest_dis, County_id, County, Town_id, Township, Reserv_id, Reservoir, Watersh_id, Watershed, Basin_id, Basin, ST_Area(M.geom) AS Area, ST_X(ST_Centroid(M.geom)) AS Centroid_X, ST_Y(ST_Centroid(M.geom)) AS Centroid_Y
+SELECT M.geom, M.GEOM_ID, M.project, M.dmcdate, Working_id, Working_ci, Forest_id, Forest_dis, County_id, County, Town_id, Township, Reserv_id, Reservoir, Watersh_id, Watershed, Basin_id, Basin, ST_Area(M.geom) AS Area, ST_X(ST_Centroid(M.geom)) AS Centroid_X, ST_Y(ST_Centroid(M.geom)) AS Centroid_Y
 FROM MP_WC_F_C_T_R_W_B, merged M
 WHERE M.GEOM_ID = MP_WC_F_C_T_R_W_B.GEOM_ID
 ORDER BY M.GEOM_ID;

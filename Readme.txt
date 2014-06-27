@@ -61,3 +61,8 @@ This program is a toolbox written for the following functions:
  -Delete unused commands.
 -----------2014-06-27 10:36-----------
 
+-----------2014-06-28 03:20-----------
+1.Analysis: Add message for skipped shapefile names which have no landslide and riverside.
+2.Merge: Algorithm modified for new database structure. Remove handling for image name.
+3.Zonal: Algorithm modified for new database structure. Remove handling for image name.
+-----------2014-06-28 03:20-----------

@@ -34,23 +34,23 @@ CREATE SEQUENCE GEO_ID START 1;
 /*explode multipolygons to single parts*/
 DROP TABLE IF EXISTS T1_exp;
 CREATE TEMP TABLE T1_exp AS
- SELECT gid AS T1_gid, dmcname AS T1_dmcname, project AS T1_project, dmcdate AS T1_date, (ST_Dump(geom)).geom
+ SELECT gid AS T1_gid, project AS T1_project, dmcdate AS T1_date, (ST_Dump(geom)).geom
  FROM table1;
 
 DROP TABLE IF EXISTS T2_exp; 
 CREATE TEMP TABLE T2_exp AS 
- SELECT gid AS T2_gid, dmcname AS T2_dmcname, project AS T2_project, dmcdate AS T2_date, (ST_Dump(geom)).geom
+ SELECT gid AS T2_gid, project AS T2_project, dmcdate AS T2_date, (ST_Dump(geom)).geom
  FROM table2;
  
 DROP TABLE IF EXISTS T1_exp2;
 CREATE TEMP TABLE T1_exp2 AS
- --SELECT gid AS T1_gid, dmcname AS T1_dmcname, project AS T1_project, dmcdate AS T1_date, (ST_Dump(geom)).geom
- SELECT gid AS T1_gid, dmcname AS T1_dmcname, project AS T1_project, dmcdate AS T1_date, ST_MakePolygon(St_ExteriorRing((ST_Dump(geom)).geom)) geom
+ --SELECT gid AS T1_gid, project AS T1_project, dmcdate AS T1_date, (ST_Dump(geom)).geom
+ SELECT gid AS T1_gid, project AS T1_project, dmcdate AS T1_date, ST_MakePolygon(St_ExteriorRing((ST_Dump(geom)).geom)) geom
  FROM table1;
 
 DROP TABLE IF EXISTS T2_exp2; 
 CREATE TEMP TABLE T2_exp2 AS 
- SELECT gid AS T2_gid, dmcname AS T2_dmcname, project AS T2_project, dmcdate AS T2_date, ST_MakePolygon(St_ExteriorRing((ST_Dump(geom)).geom)) geom
+ SELECT gid AS T2_gid, project AS T2_project, dmcdate AS T2_date, ST_MakePolygon(St_ExteriorRing((ST_Dump(geom)).geom)) geom
  FROM table2;
 
  
@@ -88,9 +88,9 @@ FROM new_polys;
 
 DROP TABLE IF EXISTS T1_T2_combo;
 CREATE TEMP TABLE T1_T2_combo AS
-SELECT T1_gid, T1_dmcname, T1_project, T1_date, null AS T2_gid, null AS T2_dmcname, null AS T2_project, null AS T2_date, geom as geom FROM T1_exp2
+SELECT T1_gid, T1_project, T1_date, null AS T2_gid, null AS T2_project, null AS T2_date, geom as geom FROM T1_exp2
 UNION ALL
-SELECT null AS T1_gid, null AS T1_dmcname, null AS T1_project, null AS T1_date, T2_gid, T2_dmcname, T2_project, T2_date, geom as geom FROM T2_exp2;
+SELECT null AS T1_gid, null AS T1_project, null AS T1_date, T2_gid, T2_project, T2_date, geom as geom FROM T2_exp2;
  
 /*group by geom and aggregate original ids by point overlap*/
 /* Replicates an ArcGIS-style Union*/
@@ -112,28 +112,27 @@ CREATE TEMP TABLE T1_T2_unionjoin AS
 	T1.gid AS T1_gid, 
 	T2.gid AS T2_gid, 
 	array_distinct(ARRAY[T1.gid] || T2.gid) AS Agid, 
-	array_distinct(array_cat(T1.dmcname, T2.dmcname)) AS Aname, 
 	array_distinct(ARRAY[T1.project::text] || T2.project::text) AS Aproject, 
 	array_distinct(ARRAY[T1.dmcdate] || T2.dmcdate) AS Adate
  FROM T1_T2_union AS UGeom LEFT JOIN table1 AS T1 ON T1.gid = UGeom.T1_gid LEFT JOIN table2 AS T2 ON T2.gid = UGeom.T2_gid;
  
 DROP TABLE IF EXISTS table1;
 CREATE TABLE table1 AS 
- SELECT CAST(nextval('GEO_ID') AS integer) AS gid, MAX(UJoin.Aname) AS dmcname, MAX(UJoin.Aproject[1]) AS project, MAX(UJoin.Adate[1]) AS dmcdate, ST_Multi(ST_Union(UJoin.geom)) AS GEOM
+ SELECT CAST(nextval('GEO_ID') AS integer) AS gid, MAX(UJoin.Aproject[1]) AS project, MAX(UJoin.Adate[1]) AS dmcdate, ST_Multi(ST_Union(UJoin.geom)) AS GEOM
  FROM T1_T2_unionjoin AS UJoin
  GROUP BY T1_gid, T2_gid;
  
 DROP TABLE IF EXISTS TALL;
-CREATE TABLE TALL (gid serial PRIMARY KEY, dmcname text[], project text, dmcdate date, geom geometry);
-INSERT INTO TALL (dmcname, project, dmcdate, geom)
- SELECT dmcname, project, dmcdate, geom
+CREATE TABLE TALL (gid serial PRIMARY KEY, project text, dmcdate date, geom geometry);
+INSERT INTO TALL (project, dmcdate, geom)
+ SELECT project, dmcdate, geom
  FROM table1
  UNION (
-  SELECT dmcname, project::text, dmcdate, geom
+  SELECT project::text, dmcdate, geom
   FROM t1 
   )
  UNION (
-  SELECT dmcname, project::text, dmcdate, geom
+  SELECT project::text, dmcdate, geom
   FROM t2
  );
 
