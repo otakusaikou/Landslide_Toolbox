@@ -54,3 +54,10 @@ This program is a toolbox written for the following functions:
 1.Add GUI of config settings for all programs.
 -----------2014-06-21 01:05-----------
 
+-----------2014-06-27 10:36-----------
+1.Analysis:
+ -Ignore unused attributes like brightness and ndvi.
+ -Add a new check button. Let user to choose whether to do all analysis process or just do coordinate transformation.
+ -Delete unused commands.
+-----------2014-06-27 10:36-----------
+

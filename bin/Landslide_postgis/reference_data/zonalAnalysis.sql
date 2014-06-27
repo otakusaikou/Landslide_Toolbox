@@ -19,11 +19,8 @@ SELECT gid,
 	dmcname,
 	project,
 	dmcdate,
-	area_pxl, 
-	brightness, 
 	lengthwidt, 
 	main_direc, 
-	ndvi,
 	slope_mean,
 	--CASE WHEN ABS(AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) - main_direc) > 180
 		--THEN (360 - ABS(AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) - main_direc))
@@ -34,7 +31,7 @@ SELECT gid,
 	geom
  FROM aspectlayer, tmp
  WHERE ST_Intersects(geom, rast)
-GROUP BY gid, shp_id, dmcname, project, dmcdate, area_pxl, brightness, lengthwidt, main_direc, ndvi, slope_mean, geom;
+GROUP BY gid, shp_id, dmcname, project, dmcdate, lengthwidt, main_direc, slope_mean, geom;
 
 CREATE TABLE RiverSide AS
  SELECT *
@@ -47,13 +44,3 @@ CREATE TABLE VectorData AS
  FROM tmp2 AS T
  WHERE T.gid NOT IN (SELECT gid
             FROM RiverSide);
- 
-
-
-
-
-
-
-
-
-

@@ -33,6 +33,15 @@ class GUI:
         else:
            result = os.popen("python conf.py")
         os.chdir(cur)
+
+    def setFileChooser(self, widget):
+        flag = not self.doTransOnly.get_active()
+        self.label3.set_sensitive(flag) 
+        self.label4.set_sensitive(flag) 
+        self.button3.set_sensitive(flag) 
+        self.button4.set_sensitive(flag) 
+        self.overwriteBtn1.set_sensitive(flag) 
+        self.overwriteBtn2.set_sensitive(flag) 
  
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -120,6 +129,16 @@ class GUI:
         
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
+
+    ##Just do Coordinates Transformation Check Button
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(5)
+        mainbox.pack_start(hbox, True, False, 0)
+
+        self.doTransOnly = gtk.CheckButton("Just Do Coordinates Transformation")
+        self.doTransOnly.set_active(False)
+        self.doTransOnly.connect("toggled", self.setFileChooser)
+        hbox.pack_start(self.doTransOnly, False, False, 10)
         
     ##slope layer 
         self.label3 = gtk.Label("The slope layer path...")
@@ -140,14 +159,6 @@ class GUI:
         self.overwriteBtn1 = gtk.CheckButton("Overwrite Old Table")
         self.overwriteBtn1.set_active(False)
         hbox.pack_start(self.overwriteBtn1, False, False, 10)
-        
-    ##separator
-        hbox = gtk.HBox(False, 0)
-        hbox.set_border_width(10)
-        mainbox.pack_start(hbox, True, False, 0)
-        
-        hsaparator = gtk.HSeparator()
-        hbox.pack_start(hsaparator, True, True, 10)
         
     ##aspect layer 
         self.label4 = gtk.Label("The aspect layer path...")
@@ -235,18 +246,19 @@ class GUI:
             self.showMessage("Can't find any valid dem raster file.", None, False, gtk.MESSAGE_WARNING)
             return
 
+        flag = not self.doTransOnly.get_active()
         #check if the slope raster file is valid
-        if not self.button3.get_filename():
+        if not self.button3.get_filename() and flag:
             self.showMessage("Can't find any valid slope raster file.", None, False, gtk.MESSAGE_WARNING)
             return
 
         #check if the aspect raster file is valid
-        if not self.button4.get_filename():
+        if not self.button4.get_filename() and flag:
             self.showMessage("Can't find any valid aspect raster file.", None, False, gtk.MESSAGE_WARNING)
             return 
 
         A = Analysis(self.button1.get_filename(), self.button5.get_filename(), self.button2.get_filename(), self.button3.get_filename(), self.button4.get_filename())
-        msg, result, writelog, icon = A.transform(shp_list, self.overwriteBtn1.get_active(), self.overwriteBtn2.get_active())
+        msg, result, writelog, icon = A.transform(shp_list, self.overwriteBtn1.get_active(), self.overwriteBtn2.get_active(), flag)
         self.showMessage(msg, result, writelog, icon)
         
     #pop up error message and write out result
@@ -286,16 +298,8 @@ class Analysis:
         if not os.path.exists(self.outputdir):
             os.mkdir(self.outputdir)
             
-        if not os.path.exists(self.tmpdir):
-            os.mkdir(self.tmpdir)
             
-        if not os.path.exists(os.path.join(self.outputdir, "RiverSide")):
-            os.mkdir(os.path.join(self.outputdir, "RiverSide"))
-        
-        if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
-            os.mkdir(os.path.join(self.outputdir, "Landslide")) 
-            
-    def transform(self, shp_list, overwriteSlope, overwriteAspect):
+    def transform(self, shp_list, overwriteSlope, overwriteAspect, flag):
         tStart = time.time()
         
         result = ""
@@ -309,28 +313,42 @@ class Analysis:
 
         result = ""
         
-        #coordinate transformation
-        result += img2map(shp_list, self.inputdir, self.tmpdir, self.demlayer)
+        #flag means that program will do both coordinate transformation and zonal statistic analysis
+        if flag:
+            if not os.path.exists(self.tmpdir):
+                os.mkdir(self.tmpdir)
+                
+            #coordinate transformation
+            result += img2map(shp_list, self.inputdir, self.tmpdir, self.demlayer, flag)
+                
+            if not os.path.exists(os.path.join(self.outputdir, "RiverSide")):
+                os.mkdir(os.path.join(self.outputdir, "RiverSide"))
+            
+            if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
+                os.mkdir(os.path.join(self.outputdir, "Landslide")) 
+            #landslide analysis
+            msg, result2, writelog, haveerror = landslide_analysis(conn, os.path.join(self.tmpdir, "landslide_97"), self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
         
-        #landslide analysis
-        msg, result2, writelog, haveerror = landslide_analysis(conn, self.tmpdir, self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
+            #update result
+            result += result2
         
-        #update result
-        result += result2
+            #check error
+            if haveerror:
+                return msg, result, writelog, gtk.MESSAGE_WARNING
         
-        #check error
-        if haveerror:
-            return msg, result, writelog, gtk.MESSAGE_WARNING
+            #get original landslide
+            msg, result2, writelog, haveerror = extract_origin(self.inputdir, self.outputdir)
+            
+            #check error
+            if haveerror:
+                return msg, result, writelog, gtk.MESSAGE_WARNING
         
-        #get original landslide
-        msg, result2, writelog, haveerror = extract_origin(self.inputdir, self.outputdir)
+            #update result
+            result += result2
+            
+        else:
+            result += img2map(shp_list, self.inputdir, self.outputdir, self.demlayer, flag)
         
-        #update result
-        result += result2
-        
-        #check error
-        if haveerror:
-            return msg, result, writelog, gtk.MESSAGE_WARNING
             
         tEnd = time.time()
         
