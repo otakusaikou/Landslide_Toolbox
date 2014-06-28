@@ -77,7 +77,12 @@ class GUI:
         rightvbox.pack_start(self.methodMerge, True, False, 0)
         self.methodMerge.show()
         
-        self.methodUnion = gtk.RadioButton(self.methodMerge, "Union")
+        self.methodFastMerge = gtk.RadioButton(self.methodMerge, "Fast Merge")
+        self.methodFastMerge.connect("toggled", self.changeEntry, "Fast Merge")
+        rightvbox.pack_start(self.methodFastMerge, True, False, 0)
+        self.methodFastMerge.show()
+
+        self.methodUnion = gtk.RadioButton(self.methodFastMerge, "Union")
         self.methodUnion.connect("toggled", self.changeEntry, "Union")
         rightvbox.pack_start(self.methodUnion, True, False, 0)
         self.methodUnion.show()
@@ -240,7 +245,14 @@ class GUI:
                 while os.path.exists(os.path.join(self.button2.get_filename(), filename)):
                     filename = os.path.splitext(filename)[0][:-2] + "_%d.shp" % num
                     num += 1
-            msg, result, writelog, icon = M.merge(self.methodMerge.get_active(), filename)
+            #check merge mode
+            #for normal merge
+            if self.methodMerge.get_active():
+                msg, result, writelog, icon = M.merge("normalMerge", filename)
+            elif self.methodFastMerge.get_active():
+                msg, result, writelog, icon = M.merge("fastMerge", filename)
+            elif self.methodUnion.get_active():
+                msg, result, writelog, icon = M.merge("unionOnly", filename)
         
         self.showMessage(msg, result, writelog, icon)
 
@@ -299,13 +311,13 @@ class Merge:
             try:
                 ##have no tolerance for buffering
                 if threshold == 0.00000001:
-                    cur.execute(open(os.path.join(mergepath, "reference_data", "mergeall.sql"), "r").read())
+                    cur.execute(open(os.path.join(mergepath, "reference_data", "mergeall.sql"), "r").read().replace("input_table", tablename))
                     conn.commit()
                     break
                 else:
                     print "Change the ST_buffer tolerance to %.7f" % threshold
                     result += "Change the ST_buffer tolerance to %.7f\n" % threshold
-                    cur.execute(open(os.path.join(mergepath, "reference_data", "mergeall.sql"), "r").read().replace("0", "%.7f" % threshold))
+                    cur.execute(open(os.path.join(mergepath, "reference_data", "mergeall.sql"), "r").read().replace("0", "%.7f" % threshold).replace("input_table", tablename))
                     conn.commit()
                     break
             except:
@@ -313,8 +325,8 @@ class Merge:
             #change the ST_buffer tolerance
             threshold *= 10
 
-        #get intersetion attributes from t1 and unishp table
-        cur.execute("SELECT U.gid AS gid, t1.project AS project, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.project, t1.dmcdate;")
+        #get intersetion attributes from input table and unishp table
+        cur.execute("SELECT U.gid AS gid, t1.project AS project, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.project, t1.dmcdate;".replace("t1", tablename))
         ans = cur.fetchall()
         sql = "ALTER TABLE unishp ADD COLUMN project text; ALTER TABLE unishp ADD COLUMN dmcdate date;"
         for i in range(len(ans)):
@@ -322,7 +334,7 @@ class Merge:
         cur.execute(sql)
         conn.commit()
         
-        cur.execute("DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS %s;ALTER TABLE unishp RENAME TO %s;" % (tablename, tablename))
+        cur.execute("DROP TABLE IF EXISTS %s;ALTER TABLE unishp RENAME TO %s;" % (tablename, tablename))
         conn.commit()
         
         return result
@@ -406,7 +418,7 @@ class Merge:
         
         return "Works done! It took %f sec" % (tEnd - tStart), result, True, gtk.MESSAGE_INFO
          
-    def merge(self, unionOnly, filename):
+    def merge(self, mode, filename):
         tStart = time.time()
         
         result = ""
@@ -445,16 +457,35 @@ class Merge:
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[0], dbname)
             result += os.popen(cmdstr).read()
             
+            #dissolve t1 if mode is fastMerge 
+            if mode == "fastMerge":
+                print "Dissolve shapefile '%s'..." % shp_list[0]
+                result += "Dissolve shapefile '%s'...\n" % shp_list[0]
+                result += self.dissolve(cur, conn, "t1")
+            
             #upload t2
             cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_list[1], dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[1], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
+            
+            #dissolve t2 if mode is fastMerge 
+            if mode == "fastMerge":
+                print "Dissolve shapefile '%s'..." % shp_list[1]
+                result += "Dissolve shapefile '%s'...\n" % shp_list[1]
+                result += self.dissolve(cur, conn, "t2")
 
             result += "Create union with shapefiles '%s' and '%s'...\n" % (shp_list[0], shp_list[1]) 
             print "Create union with shapefiles '%s' and '%s'..." % (shp_list[0], shp_list[1])
             #merge t1t and t2t and rename result table name to t1
             cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
+            
+            #dissolve union of t1 and t2 if mode is fastMerge
+            if mode == "fastMerge":
+                print "Dissolve shapefile union..."
+                result += "Dissolve shapefile union...\n"
+                result += self.dissolve(cur, conn, "t1")
+
             conn.commit()
         except:
             #delete template tables
@@ -476,7 +507,21 @@ class Merge:
                     result += os.popen(cmdstr).read()
                     result += "Create union with shapefile '%s'...\n" % shp_data 
                     print "Create union with shapefile '%s'..." % shp_data
+
+                    #dissolve t2 if mode is fastMerge 
+                    if mode == "fastMerge":
+                        print "Dissolve shapefile '%s'..." % shp_data
+                        result += "Dissolve shapefile '%s'...\n" % shp_data
+                        result += self.dissolve(cur, conn, "t2")
+
                     cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
+                    
+                    #dissolve union if mode is fastMerge
+                    if mode == "fastMerge":
+                        print "Dissolve shapefile union..."
+                        result += "Dissolve shapefile union...\n"
+                        result += self.dissolve(cur, conn, "t1")
+                    
                     conn.commit()
                 except:
                     #delete template tables
@@ -495,7 +540,7 @@ class Merge:
                     return "Import shapefile data error.\nShapefile name is '%s'.\n" % shp_data, result, True, gtk.MESSAGE_WARNING
         
         #dissolve union
-        if unionOnly:
+        if mode == "normalMerge":
             print "Dissolve shapefile union..."
             result += "Dissolve shapefile union...\n"
             result += self.dissolve(cur, conn, "t1")

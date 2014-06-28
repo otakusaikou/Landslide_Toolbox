@@ -66,3 +66,7 @@ This program is a toolbox written for the following functions:
 2.Merge: Algorithm modified for new database structure. Remove handling for image name.
 3.Zonal: Algorithm modified for new database structure. Remove handling for image name.
 -----------2014-06-28 03:20-----------
+
+-----------2014-06-28 17:55-----------
+1.Merge: Add fast merge method.
+-----------2014-06-28 17:55-----------

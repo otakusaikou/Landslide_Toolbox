@@ -1,16 +1,16 @@
 /*merge all small polygons (without attribute)*/
 
 /*split all multi-polygons to single polygon*/
-DROP TABLE IF EXISTS T1_exp;
-CREATE TEMP TABLE T1_exp AS
+DROP TABLE IF EXISTS input_table_exp;
+CREATE TEMP TABLE input_table_exp AS
  SELECT (ST_Dump(geom)).geom
- FROM T1;
+ FROM input_table;
 
 /*create buffer*/
 DROP TABLE IF EXISTS U1_BUF ;
 CREATE TEMP TABLE U1_BUF AS
 SELECT ST_Buffer(geom, 0) AS geom
-FROM T1_exp;
+FROM input_table_exp;
 
 /*merge near polygons*/
 DROP TABLE IF EXISTS U1_U ;
