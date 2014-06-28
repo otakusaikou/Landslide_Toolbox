@@ -457,35 +457,39 @@ class Merge:
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[0], dbname)
             result += os.popen(cmdstr).read()
             
-            #dissolve t1 if mode is fastMerge 
-            if mode == "fastMerge":
-                print "Dissolve shapefile '%s'..." % shp_list[0]
-                result += "Dissolve shapefile '%s'...\n" % shp_list[0]
-                result += self.dissolve(cur, conn, "t1")
-            
             #upload t2
             cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_list[1], dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[1], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
             
-            #dissolve t2 if mode is fastMerge 
-            if mode == "fastMerge":
-                print "Dissolve shapefile '%s'..." % shp_list[1]
-                result += "Dissolve shapefile '%s'...\n" % shp_list[1]
-                result += self.dissolve(cur, conn, "t2")
+            #get intersection area (two tables, table1 and table2) and delete them from t1 and t2
+            result += "Get intersection area of two shapefiles '%s' and '%s'...\n" % (shp_list[0], shp_list[1]) 
+            print "Get intersection area of two shapefiles '%s' and '%s'..." % (shp_list[0], shp_list[1])
+            cur.execute(open(os.path.join(mergepath, "reference_data", "getIntersection.sql"), "r").read())
+            conn.commit()
+            
+            #dissolve t1 if mode is fastMerge and number of rows greater than 100 
+            cur.execute("SELECT COUNT(*) FROM table1")
+            nrows = int(cur.fetchall()[0][0])
+            if mode == "fastMerge" and nrows > 100:
+                print "Shapefile '%s' has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve shapefile '%s'..." % (shp_list[0], nrows, shp_list[1], shp_list[0])
+                result += "Shapefile '%s' has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve shapefile '%s'...\n" % (shp_list[0], nrows, shp_list[1], shp_list[0])
+                result += self.dissolve(cur, conn, "table1")
+            
+            #dissolve t2 if mode is fastMerge and number of rows greater than 100 
+            cur.execute("SELECT COUNT(*) FROM table2")
+            nrows = int(cur.fetchall()[0][0])
+            if mode == "fastMerge" and nrows > 100:
+                print "Shapefile '%s' has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve shapefile '%s'..." % (shp_list[1], nrows, shp_list[0], shp_list[1])
+                result += "Shapefile '%s' has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve shapefile '%s'...\n" % (shp_list[1], nrows, shp_list[0], shp_list[1])
+                result += self.dissolve(cur, conn, "table2")
 
             result += "Create union with shapefiles '%s' and '%s'...\n" % (shp_list[0], shp_list[1]) 
             print "Create union with shapefiles '%s' and '%s'..." % (shp_list[0], shp_list[1])
-            #merge t1t and t2t and rename result table name to t1
-            cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
+            #merge t1 and t2 and rename result table name to t1
+            cur.execute(open(os.path.join(mergepath, "reference_data", "union.sql"), "r").read())
             
-            #dissolve union of t1 and t2 if mode is fastMerge
-            if mode == "fastMerge":
-                print "Dissolve shapefile union..."
-                result += "Dissolve shapefile union...\n"
-                result += self.dissolve(cur, conn, "t1")
-
             conn.commit()
         except:
             #delete template tables
@@ -507,40 +511,41 @@ class Merge:
                     result += os.popen(cmdstr).read()
                     result += "Create union with shapefile '%s'...\n" % shp_data 
                     print "Create union with shapefile '%s'..." % shp_data
-
-                    #dissolve t2 if mode is fastMerge 
-                    if mode == "fastMerge":
-                        print "Dissolve shapefile '%s'..." % shp_data
-                        result += "Dissolve shapefile '%s'...\n" % shp_data
-                        result += self.dissolve(cur, conn, "t2")
-
-                    cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
                     
-                    #dissolve union if mode is fastMerge
-                    if mode == "fastMerge":
-                        print "Dissolve shapefile union..."
-                        result += "Dissolve shapefile union...\n"
-                        result += self.dissolve(cur, conn, "t1")
-                    
+                    #get intersection area (two tables, table1 and table2) and delete them from t1 and t2
+                    result += "Get intersection area of union table and new shapefile '%s'...\n" % shp_data 
+                    print "Get intersection area of union table and new shapefile '%s'..." % shp_data 
+                    cur.execute(open(os.path.join(mergepath, "reference_data", "getIntersection.sql"), "r").read())
+                    conn.commit()
+
+                    #dissolve t1 if mode is fastMerge and number of rows greater than 100 
+                    cur.execute("SELECT COUNT(*) FROM table1")
+                    nrows = int(cur.fetchall()[0][0])
+                    if mode == "fastMerge" and nrows > 100:
+                        print "Union table has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve union table..." % (nrows, shp_data)
+                        result += "Union table has %d intersection with shapefile '%s',\nThis number is greater than threshold.\nDissolve union table...\n" % (nrows, shp_data)
+                        result += self.dissolve(cur, conn, "table1")
+
+                    #dissolve t2 if mode is fastMerge and number of rows greater than 100 
+                    cur.execute("SELECT COUNT(*) FROM table2")
+                    nrows = int(cur.fetchall()[0][0])
+                    if mode == "fastMerge" and nrows > 100:
+                        print "Shapefile '%s' has %d intersection with union table,\nThis number is greater than threshold.\nDissolve shapefile '%s'..." % (shp_data, nrows, shp_data)
+                        result += "Shapefile '%s' has %d intersection with union table,\nThis number is greater than threshold.\nDissolve shapefile '%s'...\n" % (shp_data, nrows, shp_data)
+                        result += self.dissolve(cur, conn, "table2")
+
+                    cur.execute(open(os.path.join(mergepath, "reference_data", "union.sql"), "r").read())
                     conn.commit()
                 except:
                     #delete template tables
                     conn.rollback()
-                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_data, dbname, user)
-                    print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
-                    result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
-                    result += os.popen(cmdstr).read()
-                    result += "Create union with shapefile '%s'...\n" % shp_data 
-                    print "Create union with shapefile '%s'..." % shp_data
-                    cur.execute(open(os.path.join(mergepath, "reference_data", "union2array.sql"), "r").read())
-                    conn.commit()
                     cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
                     conn.commit()
                     conn.close()
                     return "Import shapefile data error.\nShapefile name is '%s'.\n" % shp_data, result, True, gtk.MESSAGE_WARNING
         
         #dissolve union
-        if mode == "normalMerge":
+        if mode == "normalMerge" or mode == "fastMerge":
             print "Dissolve shapefile union..."
             result += "Dissolve shapefile union...\n"
             result += self.dissolve(cur, conn, "t1")

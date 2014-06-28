@@ -18,7 +18,6 @@ CREATE TEMP TABLE U1_U AS
 SELECT ST_Buffer(ST_Union(geom), 0) AS geom
 FROM U1_BUF;
 
-
 DROP TABLE IF EXISTS unishp;
 CREATE TABLE unishp (gid serial PRIMARY KEY, geom geometry);
 INSERT INTO unishp (geom)
