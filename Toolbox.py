@@ -62,6 +62,10 @@ class ToolBox:
             os.chdir(os.path.join(root, "bin", "Upload"))
             os.popen("python conf.py 1")
             os.chdir(root)
+        elif label == "Export":
+            os.chdir(os.path.join(root, "bin", "Export"))
+            os.popen("python conf.py 1")
+            os.chdir(root)
         elif label == "Analysis":
             os.chdir(os.path.join(root, "bin", "Landslide_postgis"))
             os.popen("python conf.py 1")
