@@ -70,3 +70,7 @@ This program is a toolbox written for the following functions:
 -----------2014-06-28 17:55-----------
 1.Merge: Add fast merge method.
 -----------2014-06-28 17:55-----------
+
+-----------2014-06-28 18:08-----------
+1.Export: Bug in config setting panel fixed..
+-----------2014-06-28 18:08-----------

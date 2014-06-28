@@ -183,7 +183,7 @@ if __name__ == '__main__':
         settings.write("host=localhost\ndbname=landslide\nuser=postgres\npassword=mypassword\ndatefield=DMCDATE")
         settings.close()
         host = "localhost"
-        dbname = "landslide"
+        database = "landslide"
         user = "postgres"
         password = "mypassword"
         split_field = "DMCDATE"
