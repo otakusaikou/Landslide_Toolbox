@@ -85,3 +85,7 @@ This program is a toolbox written for the following functions:
 2.Analysis: Bug in connection of database fixed.
 3.Export: Bug in output table name fixed.
 -----------2014-06-30 10:15-----------
+
+-----------2014-06-30 19:45-----------
+1.Merged: Delete unused commands.
+-----------2014-06-30 19:45-----------

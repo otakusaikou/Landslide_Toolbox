@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/05/10
+Updated on 2014/06/30
 @author: Otakusaikou
 '''
 import os
@@ -288,23 +288,8 @@ class Merge:
         if not os.path.exists(outputdir):
             os.mkdir(outputdir)
             
-    def uploadshp(self, shp_data, cur, conn):
-        #delete old table
-        cur.execute("DROP TABLE IF EXISTS t1;")
-        conn.commit()
-        
-        cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
-        print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
-        result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
-        result = os.popen(cmdstr).read()
-        
-        return result
-        
-    def dissolve(self, cur, conn, tablename, upload = False, shp_data = None):
-        if upload:
-            result = self.uploadshp(shp_data, cur, conn)
-        else:
-            result = ""
+    def dissolve(self, cur, conn, tablename):
+        result = ""
 
         threshold = 0.00000001
         while threshold <= 0.0000001:

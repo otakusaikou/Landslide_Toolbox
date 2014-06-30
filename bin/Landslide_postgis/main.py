@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/08/15
-Updated on 2014/05/10
+Updated on 2014/06/30
 @author: Otakusaikou
 Description: This program is a GUI version of two shp file processor
 '''
