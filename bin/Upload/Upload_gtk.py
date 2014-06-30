@@ -17,7 +17,7 @@ import time
 class GUI:
     def __init__(self, inputdir = os.getcwd()):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title('Upload.py')
+        window.set_title('Upload')
         window.set_size_request(350, 170)
         window.connect('destroy', lambda w: gtk.main_quit())
 
@@ -206,11 +206,11 @@ class Upload:
             os.chdir(inputdir) #change current directory to target shapefile
             #check 'Existing Table' option
             if checkbutton:
-                cmdstr = "shp2pgsql -s 3826 -a -W big5 %s %s | psql -d %s -U %s" % (shp_data, self.tablename, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -a -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
                 result += os.popen(cmdstr).read()
                 return "Import shapefile '%s' to database '%s' to existing table '%s' successfully.\n" % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
             else:
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -d %s -U %s" % (shp_data, self.tablename, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
                 result += os.popen(cmdstr).read()
                 return "Import shapefile '%s' to database '%s' as table '%s' successfully." % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
         except:

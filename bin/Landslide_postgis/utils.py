@@ -273,7 +273,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         
         #import new data
         try:
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s inputdata | psql -d %s -U %s" % (shp_data, database, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s inputdata | psql -h %s -d %s -U %s" % (shp_data, host, database, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_data, database)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, database)
             result += os.popen(cmdstr).read()

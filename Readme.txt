@@ -79,3 +79,9 @@ This program is a toolbox written for the following functions:
 -----------2014-06-29 01:35-----------
 1.Merge: Algorithm modified. The program will automatically check the number of intersection polygons. If union table has more than 100 intersection polygons with new shapefile, dissolve these intersection polygons, otherwise get the union of union table and new shapefile directly.
 -----------2014-06-29 01:35-----------
+
+-----------2014-06-30 10:15-----------
+1.All: Add support for remote processing.
+2.Analysis: Bug in connection of database fixed.
+3.Export: Bug in output table name fixed.
+-----------2014-06-30 10:15-----------

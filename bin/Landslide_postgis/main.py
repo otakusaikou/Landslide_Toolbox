@@ -45,7 +45,7 @@ class GUI:
  
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title('Landslide_processor.py')
+        window.set_title('Analysis')
         window.set_size_request(430, 500)
         window.connect('destroy', lambda w: gtk.main_quit())
 
@@ -349,8 +349,9 @@ class Analysis:
             #coordinate transformation
             result += img2map(shp_list, self.inputdir, self.outputdir, self.demlayer, flag)
         
-            
+        conn.close()
         tEnd = time.time()
+
         
         return "Works done! It took %f sec" % (tEnd - tStart), result, True, gtk.MESSAGE_INFO
     

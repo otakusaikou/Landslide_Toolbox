@@ -20,7 +20,7 @@ class GUI(gtk.Window):
         window.connect("delete_event", self.close_application)
         window.set_size_request(700, 745)
         window.set_position(gtk.WIN_POS_CENTER)
-        window.set_title("Export Gtk")
+        window.set_title("Export")
         window.show()
         
     ##menu bar
@@ -259,24 +259,24 @@ class GUI(gtk.Window):
         vbox2.show()###
         frame3.add(vbox2)
         
-        hbox4 = gtk.HBox(False, 0)
-        hbox4.show()###
-        vbox2.pack_start(hbox4, True, False, 0)
+        #hbox4 = gtk.HBox(False, 0)
+        #hbox4.show()###
+        #vbox2.pack_start(hbox4, True, False, 0)
         
-        label1 = gtk.Label("%s: " % split_field)
-        hbox4.pack_start(label1, False, False, 10)
-        label1.show()      
+        #label1 = gtk.Label("%s: " % split_field)
+        #hbox4.pack_start(label1, False, False, 10)
+        #label1.show()      
  
-        self.entry1 = gtk.Entry()
-        self.entry1.set_size_request(250, 20)
-        hbox4.pack_start(self.entry1, False, False, 0)
-        self.entry1.set_sensitive(False)
-        self.entry1.show()###
+        #self.entry1 = gtk.Entry()
+        #self.entry1.set_size_request(250, 20)
+        #hbox4.pack_start(self.entry1, False, False, 0)
+        #self.entry1.set_sensitive(False)
+        #self.entry1.show()###
         
-        self.checkbutton1 = gtk.CheckButton("Split Shapefile By %s" % split_field)
-        hbox4.pack_end(self.checkbutton1, False, False, 60)
-        self.checkbutton1.set_sensitive(False)
-        self.checkbutton1.show()###
+        #self.checkbutton1 = gtk.CheckButton("Split Shapefile By %s" % split_field)
+        #hbox4.pack_end(self.checkbutton1, False, False, 60)
+        #self.checkbutton1.set_sensitive(False)
+        #self.checkbutton1.show()###
         
         hbox5 = gtk.HBox(False, 0)
         hbox5.show()###
@@ -517,7 +517,7 @@ class GUI(gtk.Window):
         #f_list.sort()
         
         #if len(f_list) == 0:
-        #    cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
+        #    cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
         #    result = os.popen(cmdStr).read()
         #    count += 1
         #    log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -539,7 +539,7 @@ class GUI(gtk.Window):
         #                tmpsql = sql + "where %s = %d " % (split_field, f)
         #            else:
         #                tmpsql = sql + " AND %s = %d" % (split_field, f)
-        #            cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, password, dbname, tmpsql.encode("big5")) 
+        #            cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, password, dbname, tmpsql.encode("big5")) 
         #            result = os.popen(cmdStr).read()
         #            count += 1
         #            log.write("Generating shapefile %s...\n" % (outshp + str(f) + ".shp"))
@@ -567,7 +567,7 @@ class GUI(gtk.Window):
         #            else:
         #                sql += "AND (" + tmp + ")"
         #            
-        #        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
+        #        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
         #        result = os.popen(cmdStr).read()
         #        count += 1
         #        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -575,8 +575,10 @@ class GUI(gtk.Window):
         #        log.write(result + "\n")
         #        if "ERROR" in result or "Failed" in result:
         #            count -= 1
-                
-        cmdStr = '..\\bin\\pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
+        
+        if not outshp.endswith(".shp"):
+            outshp += ".shp"
+        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp , host, user, password, dbname, sql.encode("big5")) 
         result = os.popen(cmdStr).read()
         count += 1
         log.write("Generating shapefile %s...\n" % (outshp + ".shp"))

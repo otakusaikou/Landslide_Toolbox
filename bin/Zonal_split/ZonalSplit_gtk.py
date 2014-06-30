@@ -17,7 +17,7 @@ import string
 class GUI:
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), identitylayer = os.path.join(os.getcwd(), "identityLayer")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title('ZonalSplit.py')
+        window.set_title('ZonalSplit')
         window.set_size_request(350, 320)
         window.connect('destroy', lambda w: gtk.main_quit())
 
@@ -286,7 +286,7 @@ class ZonalSplit:
         #import merged table
         try:
             #upload merged
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s merged | psql -d %s -U %s" % (shp_name, dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s merged | psql -h %s -d %s -U %s" % (shp_name, host, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_name, dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_name, dbname)
             result += os.popen(cmdstr).read()
@@ -308,7 +308,7 @@ class ZonalSplit:
             tablename = os.path.splitext(shp_data)[0]
             try:
                 #upload identity layer
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -d %s -U %s" % (shp_data, tablename, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, tablename, host, dbname, user)
                 print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                 result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                 result += os.popen(cmdstr).read()

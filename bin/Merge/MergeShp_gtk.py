@@ -17,7 +17,7 @@ import string
 class GUI:
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title('MergeShp.py')
+        window.set_title('Merge')
         window.set_size_request(500, 270)
         window.connect('destroy', lambda w: gtk.main_quit())
 
@@ -293,7 +293,7 @@ class Merge:
         cur.execute("DROP TABLE IF EXISTS t1;")
         conn.commit()
         
-        cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -d %s -U %s" % (shp_data, dbname, user)
+        cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
         print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
         result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
         result = os.popen(cmdstr).read()
@@ -369,7 +369,7 @@ class Merge:
                 conn.commit()
                 
                 #import shapefiles to database
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -d %s -U %s" % (shp_data, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
                 print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                 result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                 result += os.popen(cmdstr).read()
@@ -452,13 +452,13 @@ class Merge:
         #import two tables
         try:
             #upload t1
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -d %s -U %s" % (shp_list[0], dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_list[0], host, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[0], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[0], dbname)
             result += os.popen(cmdstr).read()
             
             #upload t2
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_list[1], dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -d %s -U %s" % (shp_list[1], host, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[1], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
@@ -505,7 +505,7 @@ class Merge:
                 #import tables
                 try:
                     #upload t2
-                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -d %s -U %s" % (shp_data, dbname, user)
+                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
                     print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                     result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                     result += os.popen(cmdstr).read()
