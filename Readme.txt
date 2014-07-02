@@ -89,3 +89,7 @@ This program is a toolbox written for the following functions:
 -----------2014-06-30 19:45-----------
 1.Merged: Delete unused commands.
 -----------2014-06-30 19:45-----------
+
+-----------2014-07-03 12:12-----------
+1.Merged: Apply new merge algorithm.
+-----------2014-07-03 12:12-----------
