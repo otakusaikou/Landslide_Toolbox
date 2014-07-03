@@ -93,3 +93,9 @@ This program is a toolbox written for the following functions:
 -----------2014-07-03 12:12-----------
 1.Merged: Apply new merge algorithm.
 -----------2014-07-03 12:12-----------
+
+-----------2014-07-04 04:35----------
+1.Analysis: 
+ -Output content of shapefile attribute 'project' modified. 
+ -Bug in loading raster data to remote database fixed.
+-----------2014-07-04 04:35----------
