@@ -395,8 +395,8 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             conn.commit()
         except:
             conn.rollback()
-            #cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
-            #conn.commit()
+            cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
+            conn.commit()
             conn.close()
             result += "Zonal Statistic analysis error.\n"
             return "Zonal Statistic analysis error.", result, True, True
