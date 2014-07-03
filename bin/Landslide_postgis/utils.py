@@ -128,7 +128,10 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
 
         shpOut.poly(partsOut)
         records[nShape].insert(1, date)
-        records[nShape].insert(1, fileName.replace("~", "_")[0:11])
+        if fileName.startswith("0") or fileName.startswith("1"):
+            records[nShape].insert(1, "20" + fileName.replace("~", "_")[0:7])
+        else:
+            records[nShape].insert(1, "19" + fileName.replace("~", "_")[0:7])
         rec = records[nShape]
         
         shpOut.record(*rec)
@@ -227,7 +230,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         exists = cur.fetchone()[0]
         if not exists or overwriteSlope:
                 os.chdir(slopedir)
-                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -d %s -U %s" % (slopefile, database, user)
+                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -h %s -d %s -U %s" % (slopefile, host, database, user)
                 print "Import raster data '%s' to database '%s' as table 'slopelayer'..." % (slopefile, database)
                 result += "Import raster data '%s' to database '%s' as table 'slopelayer'...\n" % (slopefile, database)
                 os.popen(cmdstr)
@@ -240,7 +243,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         exists = cur.fetchone()[0]
         if not exists or overwriteAspect:
                 os.chdir(aspectdir)
-                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -d %s -U %s" % (aspectfile, database, user)
+                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -h %s -d %s -U %s" % (aspectfile, host, database, user)
                 print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
                 result += "Import raster data '%s' to database '%s' as table 'aspectlayer'...\n" % (aspectfile, database)
                 os.popen(cmdstr)
@@ -363,8 +366,8 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             conn.commit()
         except:
             conn.rollback()
-            cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
-            conn.commit()
+            #cur.execute("DROP TABLE IF EXISTS tmp2;DROP TABLE IF EXISTS tmp;DROP TABLE IF EXISTS inputdata;DROP TABLE IF EXISTS riverside;DROP TABLE IF EXISTS vectordata;")
+            #conn.commit()
             conn.close()
             result += "Zonal Statistic analysis error.\n"
             return "Zonal Statistic analysis error.", result, True, True

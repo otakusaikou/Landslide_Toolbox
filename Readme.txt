@@ -89,3 +89,9 @@ This program is a toolbox written for the following functions:
 -----------2014-06-30 19:45-----------
 1.Merged: Delete unused commands.
 -----------2014-06-30 19:45-----------
+
+-----------2014-07-04 03:07-----------
+1.Analysis: 
+ -Output content of shapefile attribute 'project' modified. 
+ -Bug in loading raster data to remote database fixed. 
+-----------2014-07-04 03:07-----------
