@@ -103,3 +103,7 @@ This program is a toolbox written for the following functions:
 -----------2014-07-04 14:45----------
 1.All: Add about dialog.
 -----------2014-07-04 14:45----------
+
+-----------2014-07-05 01:35----------
+1.All: Add support for independent execution.
+-----------2014-07-05 01:35----------

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/06/30
+Updated on 2014/07/05
 @author: Otakusaikou
 '''
 import os
@@ -33,7 +33,7 @@ class GUI:
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', '<control>H', self.show_about, 0, None)        
+            ('/Help/About', 'F1', self.show_about, 0, None)        
         )
         
         self.inputdir = inputdir
@@ -151,13 +151,13 @@ class GUI:
         self.entry1.show()
         hbox.show()
 
-    ##merge button box
+    ##zonal split button box
         hbox = gtk.HBox(False, 0)   
-        mainbox.pack_start(hbox, True, False, 15)
+        mainbox.pack_start(hbox, True, False, 25)
 
         button = gtk.Button('Zonal Split')
         button.connect('clicked', self.zonalSplitButton)
-        button.set_size_request(70, 25)
+        button.set_size_request(90, 25)
         hbox.pack_start(button, True, False, 0)
         
         button.show()
@@ -172,7 +172,7 @@ class GUI:
         dialog.set_comments("This program is witten for getting position attributes of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(zonpath, "..\\img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(zonpath, "Img\\ncculogo.png")))
 
         #show dialog
         dialog.run()

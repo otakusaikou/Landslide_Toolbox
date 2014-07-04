@@ -139,7 +139,7 @@ class ToolBox:
         dialog.set_comments("This program is witten for preprocessing of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\img\\ncculogo.png"))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\Img\\ncculogo.png"))
 
         #show dialog
         dialog.run()
@@ -177,7 +177,7 @@ class ToolBox:
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', self.config_menu, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', '<control>H', self.show_about, 0, None)        
+            ('/Help/About', 'F1', self.show_about, 0, None)        
         )
         
         menubar = self.get_main_menu(window)
@@ -271,13 +271,13 @@ if __name__ == '__main__':
     #if config file is not exist, generate a new one    
     if not os.path.exists(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini")):
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"), "w")
-        settings.write("upload_button=bin/img/load32x32.png\nexport_button=bin/img/export32x32.png\nanalysis_button1=bin/img/analysis132x32.png\nanalysis_button2=bin/img/merge32x32.png\nanalysis_button3=bin/img/zonal32x32.png")
+        settings.write("upload_button=bin/Img/load32x32.png\nexport_button=bin/Img/export32x32.png\nanalysis_button1=bin/Img/analysis132x32.png\nanalysis_button2=bin/Img/merge32x32.png\nanalysis_button3=bin/Img/zonal32x32.png")
         settings.close()
-        upload_button_path = "bin/img/load32x32.png"
-        export_button_path = "bin/img/export32x32.png"
-        analysis_button1_path = "bin/img/analysis132x32.png"
-        analysis_button2_path = "bin/img/merge32x32.png"
-        analysis_button3_path = "bin/img/zonal32x32.png"
+        upload_button_path = "bin/Img/load32x32.png"
+        export_button_path = "bin/Img/export32x32.png"
+        analysis_button1_path = "bin/Img/analysis132x32.png"
+        analysis_button2_path = "bin/Img/merge32x32.png"
+        analysis_button3_path = "bin/Img/zonal32x32.png"
         settings.close()
     else:
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"))

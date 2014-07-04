@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/10/15
-Updated on 2014/06/30
+Updated on 2014/07/05
 @author: Otakusaikou
 '''
 #The GUI for Db_extractor.
@@ -30,7 +30,7 @@ class GUI(gtk.Window):
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', '<control>H', self.show_about, 0, None)        
+            ('/Help/About', 'F1', self.show_about, 0, None)        
         )
         
         mainbox = gtk.VBox(False, 10)
@@ -342,7 +342,7 @@ class GUI(gtk.Window):
         dialog.set_comments("This program is witten for export of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "..\\img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img\\ncculogo.png")))
 
         #show dialog
         dialog.run()
