@@ -336,7 +336,7 @@ class GUI(gtk.Window):
     #about dialog
     def show_about(self, widget, data):
         dialog = gtk.AboutDialog()
-        dialog.set_name("Analysis")
+        dialog.set_name("Export")
         dialog.set_version("1.0")
         dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou)"])
         dialog.set_comments("This program is witten for export of landslide data.")

@@ -176,7 +176,7 @@ class GUI:
     #about dialog
     def show_about(self, widget, data):
         dialog = gtk.AboutDialog()
-        dialog.set_name("Analysis")
+        dialog.set_name("Merge")
         dialog.set_version("1.0")
         dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou)"])
         dialog.set_comments("This program is witten for merge and dissolve of landslide data.")
