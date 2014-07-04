@@ -99,3 +99,7 @@ This program is a toolbox written for the following functions:
  -Output content of shapefile attribute 'project' modified. 
  -Bug in loading raster data to remote database fixed.
 -----------2014-07-04 04:35----------
+
+-----------2014-07-04 14:45----------
+1.All: Add about dialog.
+-----------2014-07-04 14:45----------

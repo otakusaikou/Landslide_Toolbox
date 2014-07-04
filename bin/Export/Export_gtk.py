@@ -30,7 +30,7 @@ class GUI(gtk.Window):
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', None, None, 0, None)        
+            ('/Help/About', '<control>H', self.show_about, 0, None)        
         )
         
         mainbox = gtk.VBox(False, 10)
@@ -332,6 +332,23 @@ class GUI(gtk.Window):
         if not os.path.exists(self.outputdir):
             os.mkdir(self.outputdir)
         os.chdir(self.outputdir)
+    
+    #about dialog
+    def show_about(self, widget, data):
+        dialog = gtk.AboutDialog()
+        dialog.set_name("Analysis")
+        dialog.set_version("1.0")
+        dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou)"])
+        dialog.set_comments("This program is witten for export of landslide data.")
+        dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
+        dialog.set_website("http://goo.gl/NK8Lk0")
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "..\\img\\ncculogo.png")))
+
+        #show dialog
+        dialog.run()
+
+        #destroy method must be called otherwise the "Close" button will not work.
+        dialog.destroy()
         
     def setconfig(self, tag, widget):
         cur = os.getcwd()

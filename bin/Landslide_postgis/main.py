@@ -42,6 +42,23 @@ class GUI:
         self.button4.set_sensitive(flag) 
         self.overwriteBtn1.set_sensitive(flag) 
         self.overwriteBtn2.set_sensitive(flag) 
+
+    #about dialog
+    def show_about(self, widget, data):
+        dialog = gtk.AboutDialog()
+        dialog.set_name("Analysis")
+        dialog.set_version("1.0")
+        dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou)"])
+        dialog.set_comments("This program is witten for coordinate transformation and filtering of landslide data.")
+        dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
+        dialog.set_website("http://goo.gl/NK8Lk0")
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(analysispath, "..\\img\\ncculogo.png")))
+
+        #show dialog
+        dialog.run()
+
+        #destroy method must be called otherwise the "Close" button will not work.
+        dialog.destroy()
  
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output"), demlayer = os.path.join(os.getcwd(), "reference_data"), slopelayer = os.path.join(os.getcwd(), "reference_data"),  aspectlayer = os.path.join(os.getcwd(), "reference_data")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -59,7 +76,7 @@ class GUI:
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', gtk.main_quit, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', None, None, 0, None)        
+            ('/Help/About', '<control>H', self.show_about, 0, None)        
         )
         
         self.inputdir = inputdir

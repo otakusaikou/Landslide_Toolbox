@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/21
-Updated on 2014/05/02
+Updated on 2014/07/04
 @author: Otakusaikou
 '''
 import pygtk
@@ -13,51 +13,94 @@ import subprocess
 root = os.getcwd()
 
 class ToolBox:
+    #for upload button 
     def upload_button_event(self, widget, toolbar):
+        #change directory to target program 
         os.chdir(os.path.join(root, "bin", "Upload"))
+
+        #open target program with subprocess
         p = subprocess.Popen("python Upload_gtk.py 1")
+
+        #update subprocess list
         self.subproc.append(p)
+
+        #change directory back to main program 
         os.chdir(root)
         print "Upload"
         
+    #for export button 
     def export_button_event(self, widget, toolbar):
+        #change directory to target program 
         os.chdir(os.path.join(root, "bin", "Export"))
+
+        #open target program with subprocess
         p = subprocess.Popen("python Export_gtk.py 1")
+
+        #update subprocess list
         self.subproc.append(p)
+
+        #change directory back to main program 
         os.chdir(root)
         print "Export"
-        
+
+    #for analysis button 
     def analysis_button1_event(self, widget, toolbar):
+        #change directory to target program 
         os.chdir(os.path.join(root, "bin", "Landslide_postgis"))
+
+        #open target program with subprocess
         p = subprocess.Popen("python main.py 1")
+
+        #update subprocess list
         self.subproc.append(p)
+
+        #change directory back to main program 
         os.chdir(root)
         print "Landslide processor"
         
+    #for merge button 
     def analysis_button2_event(self, widget, toolbar):
+        #change directory to target program 
         os.chdir(os.path.join(root, "bin", "Merge"))
+
+        #open target program with subprocess
         p = subprocess.Popen("python MergeShp_gtk.py 1")
+
+        #update subprocess list
         self.subproc.append(p)
+
+        #change directory back to main program 
         os.chdir(root)
         print "Merge"
         
+    #for zonal split button 
     def analysis_button3_event(self, widget, toolbar):
+        #change directory to target program 
         os.chdir(os.path.join(root, "bin", "Zonal_split"))
+
+        #open target program with subprocess
         p = subprocess.Popen("python ZonalSplit_gtk.py 1")
+
+        #update subprocess list
         self.subproc.append(p)
+
+        #change directory back to main program 
         os.chdir(root)
         print "Zonal Split"
-        
+
+    #close button 
     def close_button_event(self, widget, toolbar=None):
+        #turn off every subprocess if close button clicked
         try:
             for p in self.subproc:
                 p.terminate()
         except:
             pass
         gtk.main_quit()
-        
+    #config setting menu    
     def config_menu(self, widget, data):
         label = data.get_label()
+        #change directory to target program and open config setting panel 
         if label == "Upload":
             os.chdir(os.path.join(root, "bin", "Upload"))
             os.popen("python conf.py 1")
@@ -78,6 +121,7 @@ class ToolBox:
             os.chdir(os.path.join(root, "bin", "Zonal_Split"))
             os.popen("python conf.py 1")
             os.chdir(root)
+        #quit event 
         elif label == "_Quit":
             try:
                 for p in self.subproc:
@@ -85,8 +129,25 @@ class ToolBox:
             except:
                 pass
             gtk.main_quit()
+
+    #about dialog
+    def show_about(self, widget, data):
+        dialog = gtk.AboutDialog()
+        dialog.set_name("Landslide Toolbox")
+        dialog.set_version("1.0")
+        dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou)"])
+        dialog.set_comments("This program is witten for preprocessing of landslide data.")
+        dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
+        dialog.set_website("http://goo.gl/NK8Lk0")
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\img\\ncculogo.png"))
+
+        #show dialog
+        dialog.run()
+
+        #destroy method must be called otherwise the "Close" button will not work.
+        dialog.destroy()
             
-        
+    #get itemfactory widget    
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()
         item_factory = gtk.ItemFactory(gtk.MenuBar, '<main>', accel_group)
@@ -97,14 +158,14 @@ class ToolBox:
  
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-        window.set_title('ToolBox Gtk')
+        window.set_title('Landslide Toolbox')
         window.set_size_request(520, 120)
         window.set_resizable(True)
         window.connect('destroy', self.close_button_event)
         
         mainbox = gtk.VBox(False, 0)
         window.add(mainbox)
-        
+        #for menu bar 
         self.menu_items = (
             ('/_File', None, None, 0, '<Branch>'),
             #('/File/Config/Toolbox', None, self.config_menu, 0, None),
@@ -116,7 +177,7 @@ class ToolBox:
             ('/File/sep1', None, None, 0,'<Separator>'),
             ('/File/_Quit', '<control>Q', self.config_menu, 0, None),
             ('/_Help', None, None, 0,'<LastBranch>'),
-            ('/Help/About', None, None, 0, None)        
+            ('/Help/About', '<control>H', self.show_about, 0, None)        
         )
         
         menubar = self.get_main_menu(window)
@@ -207,7 +268,7 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(os.path.join(os.getcwd(), "bin", "conf")):
         os.mkdir(os.path.join(os.getcwd(), "bin", "conf"))
-        
+    #if config file is not exist, generate a new one    
     if not os.path.exists(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini")):
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"), "w")
         settings.write("upload_button=bin/img/load32x32.png\nexport_button=bin/img/export32x32.png\nanalysis_button1=bin/img/analysis132x32.png\nanalysis_button2=bin/img/merge32x32.png\nanalysis_button3=bin/img/zonal32x32.png")
