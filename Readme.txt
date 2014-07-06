@@ -107,3 +107,7 @@ This program is a toolbox written for the following functions:
 -----------2014-07-05 01:35----------
 1.All: Add support for independent execution.
 -----------2014-07-05 01:35----------
+
+-----------2014-07-06 04:55----------
+1.Analysis: Bug in loading raster data to database fixed.
+-----------2014-07-06 04:55----------

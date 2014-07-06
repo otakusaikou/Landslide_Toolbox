@@ -229,6 +229,9 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='slopelayer')")
         exists = cur.fetchone()[0]
         if not exists or overwriteSlope:
+                if overwriteSlope:
+                    cur.execute("DROP TABLE IF EXISTS slopelayer;")
+                    conn.commit()
                 os.chdir(slopedir)
                 cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -h %s -d %s -U %s" % (slopefile, host, database, user)
                 print "Import raster data '%s' to database '%s' as table 'slopelayer'..." % (slopefile, database)
@@ -242,6 +245,9 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='aspectlayer')")
         exists = cur.fetchone()[0]
         if not exists or overwriteAspect:
+                if overwriteAspect:
+                    cur.execute("DROP TABLE IF EXISTS aspectlayer;")
+                    conn.commit()
                 os.chdir(aspectdir)
                 cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -h %s -d %s -U %s" % (aspectfile, host, database, user)
                 print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
