@@ -29,7 +29,7 @@ class Config:
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
         hbox.show()
-        self.label1.set_size_request(90, 20)
+        self.label1.set_size_request(110, 20)
         self.label1.show()
         hbox.pack_start(self.label1, False, False, 5)   
       
@@ -45,7 +45,7 @@ class Config:
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
         hbox.show()
-        self.label2.set_size_request(90, 20)
+        self.label2.set_size_request(110, 20)
         self.label2.show()
         hbox.pack_start(self.label2, False, False, 5)   
         
@@ -61,7 +61,7 @@ class Config:
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
         hbox.show()
-        self.label3.set_size_request(90, 20)
+        self.label3.set_size_request(110, 20)
         self.label3.show()
         hbox.pack_start(self.label3, False, False, 5)   
 
@@ -77,7 +77,7 @@ class Config:
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
         hbox.show()
-        self.label4.set_size_request(90, 20)
+        self.label4.set_size_request(110, 20)
         self.label4.show()
         hbox.pack_start(self.label4, False, False, 5)   
           
@@ -97,7 +97,7 @@ class Config:
         self.showpasswordbtn.set_active(False)
         self.showpasswordbtn.connect("toggled", self.changeVisibility)
         self.showpasswordbtn.show()
-        hbox.pack_end(self.showpasswordbtn, False, False, 35)
+        hbox.pack_end(self.showpasswordbtn, False, False, 15)
 
     ##separator
         hbox = gtk.HBox(False, 0)

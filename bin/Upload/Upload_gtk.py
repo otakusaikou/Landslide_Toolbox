@@ -18,7 +18,7 @@ class GUI:
     def __init__(self, inputdir = os.getcwd()):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Upload')
-        window.set_size_request(350, 170)
+        window.set_size_request(380, 170)
         window.connect('destroy', lambda w: gtk.main_quit())
 
         mainbox = gtk.VBox(False, 10)
@@ -111,7 +111,7 @@ class GUI:
         dialog.set_comments("This program is witten to load the results of landslide data to database.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(uploadpath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(uploadpath, "Img/ncculogo.png")))
 
         #show dialog
         dialog.run()

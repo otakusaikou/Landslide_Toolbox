@@ -30,7 +30,6 @@ def readSEL(selFile):
         omega = line[136:147]
         phi = line[147:159]
         kappa = line[159:171]
-        
         photoDict[imageName] =  x + "," + y + "," + z + "," + omega + "," + phi + "," + kappa + "," + str(date[0]) + "," + date[1] + "," + date[2]
         #print imageName, x, y, z, omega, phi, kappa
     

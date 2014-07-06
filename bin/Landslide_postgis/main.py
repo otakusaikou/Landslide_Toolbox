@@ -52,7 +52,7 @@ class GUI:
         dialog.set_comments("This program is witten for coordinate transformation and filtering of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(analysispath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(analysispath, "Img/ncculogo.png")))
 
         #show dialog
         dialog.run()
@@ -343,7 +343,7 @@ class Analysis:
             if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
                 os.mkdir(os.path.join(self.outputdir, "Landslide")) 
             #landslide analysis
-            msg, result2, writelog, haveerror = landslide_analysis(conn, os.path.join(self.tmpdir, "landslide_97"), self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
+            msg, result2, writelog, haveerror = landslide_analysis(conn, os.path.join(self.tmpdir, "Landslide_97"), self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
         
             #update result
             result += result2

@@ -342,7 +342,7 @@ class GUI(gtk.Window):
         dialog.set_comments("This program is witten for export of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img/ncculogo.png")))
 
         #show dialog
         dialog.run()
@@ -510,7 +510,7 @@ class GUI(gtk.Window):
         if self.entry2.get_text().replace(" ", "") == "":
             outshp = table
         else:
-            outshp = self.entry2.get_text().replace(" ", "").encode("big5")
+            outshp = self.entry2.get_text().replace(" ", "")#.encode("big5")
         
         statement = textbuffer.get_text(start, end)
         
@@ -595,7 +595,7 @@ class GUI(gtk.Window):
         
         if not outshp.endswith(".shp"):
             outshp += ".shp"
-        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp , host, user, password, dbname, sql.encode("big5")) 
+        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp , host, user, password, dbname, sql) 
         result = os.popen(cmdStr).read()
         count += 1
         log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
@@ -668,7 +668,7 @@ def get_records(fieldname, num):
 
     if num == 10:
         if isinstance(result[0][0], str) or isinstance(result[0][0], unicode) or isinstance(result[0][0], unicode):
-            result = [row[0].decode("big5") for row in result][:10]
+            result = [row[0] for row in result][:10]
             result.sort()
             return [result, True]
         else:
@@ -677,7 +677,7 @@ def get_records(fieldname, num):
             return [result, False]
     else:
         if isinstance(result[0][0], str) or isinstance(result[0][0], unicode):
-            result = [row[0].decode("big5") for row in result] 
+            result = [row[0] for row in result] 
             result.sort()
             return [result, True]
         else:

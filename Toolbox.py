@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/python2.7
 '''
 Created on 2014/04/21
-Updated on 2014/07/04
+Updated on 2014/07/05
 @author: Otakusaikou
 '''
 import pygtk
@@ -11,6 +11,7 @@ import os
 import subprocess
 
 root = os.getcwd()
+interpreter = "/usr/bin/python2.7"
 
 class ToolBox:
     #for upload button 
@@ -19,7 +20,7 @@ class ToolBox:
         os.chdir(os.path.join(root, "bin", "Upload"))
 
         #open target program with subprocess
-        p = subprocess.Popen("python Upload_gtk.py 1")
+        p = subprocess.Popen([interpreter, "Upload_gtk.py", "1"])
 
         #update subprocess list
         self.subproc.append(p)
@@ -34,7 +35,7 @@ class ToolBox:
         os.chdir(os.path.join(root, "bin", "Export"))
 
         #open target program with subprocess
-        p = subprocess.Popen("python Export_gtk.py 1")
+        p = subprocess.Popen([interpreter, "Export_gtk.py", "1"])
 
         #update subprocess list
         self.subproc.append(p)
@@ -49,7 +50,7 @@ class ToolBox:
         os.chdir(os.path.join(root, "bin", "Landslide_postgis"))
 
         #open target program with subprocess
-        p = subprocess.Popen("python main.py 1")
+        p = subprocess.Popen([interpreter, "main.py", "1"])
 
         #update subprocess list
         self.subproc.append(p)
@@ -64,7 +65,7 @@ class ToolBox:
         os.chdir(os.path.join(root, "bin", "Merge"))
 
         #open target program with subprocess
-        p = subprocess.Popen("python MergeShp_gtk.py 1")
+        p = subprocess.Popen([interpreter, "MergeShp_gtk.py", "1"])
 
         #update subprocess list
         self.subproc.append(p)
@@ -79,7 +80,7 @@ class ToolBox:
         os.chdir(os.path.join(root, "bin", "Zonal_split"))
 
         #open target program with subprocess
-        p = subprocess.Popen("python ZonalSplit_gtk.py 1")
+        p = subprocess.Popen([interpreter, "ZonalSplit_gtk.py", "1"])
 
         #update subprocess list
         self.subproc.append(p)
@@ -118,7 +119,7 @@ class ToolBox:
             os.popen("python conf.py 1")
             os.chdir(root)
         elif label == "Zonal Split":
-            os.chdir(os.path.join(root, "bin", "Zonal_Split"))
+            os.chdir(os.path.join(root, "bin", "Zonal_split"))
             os.popen("python conf.py 1")
             os.chdir(root)
         #quit event 
@@ -139,7 +140,7 @@ class ToolBox:
         dialog.set_comments("This program is witten for preprocessing of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\Img\\ncculogo.png"))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(os.getcwd(), "bin/Img/ncculogo.png")))
 
         #show dialog
         dialog.run()
@@ -159,7 +160,7 @@ class ToolBox:
     def __init__(self):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Landslide Toolbox')
-        window.set_size_request(520, 120)
+        window.set_size_request(595, 120)
         window.set_resizable(True)
         window.connect('destroy', self.close_button_event)
         
@@ -273,20 +274,20 @@ if __name__ == '__main__':
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"), "w")
         settings.write("upload_button=bin/Img/load32x32.png\nexport_button=bin/Img/export32x32.png\nanalysis_button1=bin/Img/analysis132x32.png\nanalysis_button2=bin/Img/merge32x32.png\nanalysis_button3=bin/Img/zonal32x32.png")
         settings.close()
-        upload_button_path = "bin/Img/load32x32.png"
-        export_button_path = "bin/Img/export32x32.png"
-        analysis_button1_path = "bin/Img/analysis132x32.png"
-        analysis_button2_path = "bin/Img/merge32x32.png"
-        analysis_button3_path = "bin/Img/zonal32x32.png"
+        upload_button_path = os.path.join(os.getcwd(), "bin/Img/load32x32.png")
+        export_button_path = os.path.join(os.getcwd(), "bin/Img/export32x32.png")
+        analysis_button1_path = os.path.join(os.getcwd(), "bin/Img/analysis132x32.png")
+        analysis_button2_path = os.path.join(os.getcwd(), "bin/Img/merge32x32.png")
+        analysis_button3_path = os.path.join(os.getcwd(), "bin/Img/zonal32x32.png)")
         settings.close()
     else:
         settings = open(os.path.join(os.getcwd(), "bin", "conf", "Toolbox.ini"))
         lines = settings.readlines()
-        upload_button_path = lines[0].split("=")[-1].replace("\n", "")
-        export_button_path = lines[1].split("=")[-1].replace("\n", "")
-        analysis_button1_path = lines[2].split("=")[-1].replace("\n", "")
-        analysis_button2_path = lines[3].split("=")[-1].replace("\n", "")
-        analysis_button3_path = lines[4].split("=")[-1].replace("\n", "")
+        upload_button_path = os.path.join(os.getcwd(), lines[0].split("=")[-1].replace("\n", ""))
+        export_button_path = os.path.join(os.getcwd(), lines[1].split("=")[-1].replace("\n", ""))
+        analysis_button1_path = os.path.join(os.getcwd(), lines[2].split("=")[-1].replace("\n", ""))
+        analysis_button2_path = os.path.join(os.getcwd(), lines[3].split("=")[-1].replace("\n", ""))
+        analysis_button3_path = os.path.join(os.getcwd(), lines[4].split("=")[-1].replace("\n", ""))
         settings.close()
     ToolBox()
     main()

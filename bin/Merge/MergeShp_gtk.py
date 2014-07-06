@@ -182,7 +182,7 @@ class GUI:
         dialog.set_comments("This program is witten for merge and dissolve of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img/ncculogo.png")))
 
         #show dialog
         dialog.run()
