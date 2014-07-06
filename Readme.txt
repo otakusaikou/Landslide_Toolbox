@@ -111,3 +111,8 @@ This program is a toolbox written for the following functions:
 -----------2014-07-06 04:55----------
 1.Analysis: Bug in loading raster data to database fixed.
 -----------2014-07-06 04:55----------
+
+-----------2014-07-07 00:46----------
+1.Upload: Change option "Existing Table" to "Use Big5 Encoding".
+2.Export: Bug in clean button fixed.
+-----------2014-07-07 00:46----------

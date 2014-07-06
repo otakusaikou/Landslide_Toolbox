@@ -77,12 +77,12 @@ class GUI:
         label2.show()
         
         self.entry1 = gtk.Entry()
-        self.entry1.set_size_request(130, 20)
+        self.entry1.set_size_request(105, 20)
         hbox.pack_start(self.entry1, False, False, 0)
         
         self.entry1.show()
-        
-        self.checkbutton = gtk.CheckButton("Existing Table")
+
+        self.checkbutton = gtk.CheckButton("Use Big5 Encoding")
         hbox.pack_start(self.checkbutton, False, True, 20)
         
         self.checkbutton.show()
@@ -209,27 +209,31 @@ class Upload:
         #check if table exists
         try:
             cur = conn.cursor()
-            cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='" + self.tablename + "')")
+            cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='" + self.tablename.lower() + "')")
             exists = cur.fetchone()[0]
-            if not exists and checkbutton:
-                return "Table '%s' dose not exist while option 'Existing Table' is active!" % self.tablename, result, True, gtk.MESSAGE_WARNING
-            elif exists and not checkbutton:
-                return "Table '%s' is exist in database '%s', you can insert new data by checking option 'Existing Table'!" % (self.tablename, dbname), result, True, gtk.MESSAGE_WARNING
+            if exists:
+                return "Table '%s' is exist in database '%s', please change a table name!" % (self.tablename, dbname), result, True, gtk.MESSAGE_WARNING
         except:
             conn.close()
 
         #import shapefile
         try:
             os.chdir(inputdir) #change current directory to target shapefile
-            #check 'Existing Table' option
+            #check 'Use Big5 Encoding' option
             if checkbutton:
-                cmdstr = "shp2pgsql -s 3826 -a -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
-                result += os.popen(cmdstr).read()
-                return "Import shapefile '%s' to database '%s' to existing table '%s' successfully.\n" % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
-            else:
                 cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
                 result += os.popen(cmdstr).read()
-                return "Import shapefile '%s' to database '%s' as table '%s' successfully." % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
+            else:
+                cmdstr = "shp2pgsql -s 3826 -c -D -I %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
+                result += os.popen(cmdstr).read()
+
+            #check if target table exists 
+            cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='" + self.tablename.lower() + "')")
+            exists = cur.fetchone()[0]
+            if exists:
+                 return "Import shapefile '%s' to database '%s' as table '%s' successfully." % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
+            else:
+                return "Import shapefile data error", result, True, gtk.MESSAGE_WARNING
         except:
             return "Import shapefile data error", result, True, gtk.MESSAGE_WARNING
             
