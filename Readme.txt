@@ -119,3 +119,7 @@ This program is a toolbox written for the following functions:
 -----------2014-07-07 00:10----------
 1.Upload: Change option "Existing Table" to "Use Big5 Encoding".
 -----------2014-07-07 00:10----------
+
+-----------2014-07-07 00:49----------
+1.Export: Bug in clean button fixed.
+-----------2014-07-07 00:49----------

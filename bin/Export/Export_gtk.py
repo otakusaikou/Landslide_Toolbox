@@ -437,7 +437,7 @@ class GUI(gtk.Window):
     def clear(self, widget):
         textbuffer = self.textview.get_buffer()
         textbuffer.set_text("")
-        self.entry1.set_text("")
+        #self.entry1.set_text("")
         
     def close_application(self, widget, event, data=None):
         gtk.main_quit()
