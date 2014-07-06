@@ -223,11 +223,11 @@ class Upload:
             os.chdir(inputdir) #change current directory to target shapefile
             #check 'Existing Table' option
             if checkbutton:
-                cmdstr = "shp2pgsql -s 3826 -a -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -a %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
                 result += os.popen(cmdstr).read()
                 return "Import shapefile '%s' to database '%s' to existing table '%s' successfully.\n" % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
             else:
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
                 result += os.popen(cmdstr).read()
                 return "Import shapefile '%s' to database '%s' as table '%s' successfully." % (shp_data, dbname, self.tablename), result, True, gtk.MESSAGE_INFO
         except:

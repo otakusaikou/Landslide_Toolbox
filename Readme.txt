@@ -112,3 +112,6 @@ This program is a toolbox written for the following functions:
 1.All: Add support for Linux.
 -----------2014-07-06 04:28----------
 
+-----------2014-07-06 21:58----------
+1.Upload: Bug in file encoding fixed.
+-----------2014-07-06 21:58----------
