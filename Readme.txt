@@ -116,3 +116,8 @@ This program is a toolbox written for the following functions:
 1.Upload: Change option "Existing Table" to "Use Big5 Encoding".
 2.Export: Bug in clean button fixed.
 -----------2014-07-07 00:46----------
+
+-----------2014-07-07 22:15----------
+1.Merge: Algorithm modified. 
+2.All: Add compelete credit information.
+-----------2014-07-07 22:15----------
