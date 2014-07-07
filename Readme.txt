@@ -123,3 +123,9 @@ This program is a toolbox written for the following functions:
 -----------2014-07-07 00:49----------
 1.Export: Bug in clean button fixed.
 -----------2014-07-07 00:49----------
+
+-----------2014-07-07 21:25----------
+1.Toolbox: Bug in loading button icon fixed.
+2.Merge: Algorithm modified. 
+3.All: Add compelete credit information.
+-----------2014-07-07 21:25----------
