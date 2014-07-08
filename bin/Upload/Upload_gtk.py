@@ -166,7 +166,7 @@ class GUI:
         return item_factory.get_widget('<main>')
     
     def reset(self, tag, widget):
-        self.button1.set_current_folder("")
+        self.button1.set_filename(os.path.join(root, " "))
         self.entry1.set_text("")
         self.checkbutton.set_active(False)
         

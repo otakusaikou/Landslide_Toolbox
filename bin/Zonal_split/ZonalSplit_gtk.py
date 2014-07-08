@@ -36,7 +36,7 @@ class GUI:
             ('/Help/About', 'F1', self.show_about, 0, None)        
         )
         
-        self.inputdir = inputdir
+        self.inputfile = inputdir
         self.outputdir = outputdir
         self.identitylayer = identitylayer
         
@@ -200,8 +200,10 @@ class GUI:
         return item_factory.get_widget('<main>')
     
     def reset(self, tag, widget):
-        self.button1.set_current_folder(self.inputdir)
-        self.button2.set_current_folder(self.outputdir)
+        self.button1.set_filename(os.path.join(root, " "))
+        self.button2.set_current_folder(self.identitylayer)
+        self.button3.set_current_folder(self.outputdir)
+        self.entry1.set_text("Result.shp")
         
     def reloadConfig(self):
         settings = open(configpath)

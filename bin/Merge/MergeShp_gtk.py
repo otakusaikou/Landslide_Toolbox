@@ -73,17 +73,17 @@ class GUI:
         
         self.methodMerge = gtk.RadioButton(None, "Merge")
         self.methodMerge.set_active(True)
-        self.methodMerge.connect("toggled", self.changeEntry, "Merge")
+        self.methodMerge.connect("toggled", self.changeMethod, "Merge")
         rightvbox.pack_start(self.methodMerge, True, False, 0)
         self.methodMerge.show()
         
         self.methodUnion = gtk.RadioButton(self.methodMerge, "Union")
-        self.methodUnion.connect("toggled", self.changeEntry, "Union")
+        self.methodUnion.connect("toggled", self.changeMethod, "Union")
         rightvbox.pack_start(self.methodUnion, True, False, 0)
         self.methodUnion.show()
         
         self.methodDissolve = gtk.RadioButton(self.methodUnion, "Dissolve")
-        self.methodDissolve.connect("toggled", self.changeEntry, "Dissolve")
+        self.methodDissolve.connect("toggled", self.changeMethod, "Dissolve")
         rightvbox.pack_start(self.methodDissolve, True, False, 0)
         self.methodDissolve.show()
         
@@ -201,10 +201,13 @@ class GUI:
            result = os.popen("python conf.py")
         os.chdir(cur)
         
-    def changeEntry(self, widget, event):
+    def changeMethod(self, widget, event):
         if event == "Dissolve":
             self.entry1.set_sensitive(False)
+        elif event == "Union":
+            self.entry1.set_text("Union.shp")
         else:
+            self.entry1.set_text("Merged.shp")
             self.entry1.set_sensitive(True)
 
         

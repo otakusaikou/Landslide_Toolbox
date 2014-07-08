@@ -121,3 +121,7 @@ This program is a toolbox written for the following functions:
 1.Merge: Algorithm modified. 
 2.All: Add compelete credit information.
 -----------2014-07-07 22:15----------
+
+-----------2014-07-08 20:40----------
+1.All: Bug in reset item values fixed.
+-----------2014-07-08 20:40----------
