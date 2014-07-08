@@ -23,8 +23,14 @@ class GUI:
     
     def reset(self, tag, widget):
         self.button1.set_current_folder(self.inputdir)
-        self.button2.set_current_folder(self.outputdir)
-    
+        self.button2.set_filename(os.path.join(self.demlayer, " "))
+        self.button3.set_filename(os.path.join(self.slopelayer, " "))
+        self.button4.set_filename(os.path.join(self.aspectlayer, " "))
+        self.button5.set_current_folder(self.outputdir)
+        self.doTransOnly.set_active(False)
+        self.overwriteBtn1.set_active(False)
+        self.overwriteBtn2.set_active(False)
+
     def setconfig(self, tag, widget):
         cur = os.getcwd()
         os.chdir(analysispath) 
@@ -36,12 +42,12 @@ class GUI:
 
     def setFileChooser(self, widget):
         flag = not self.doTransOnly.get_active()
-        self.label3.set_sensitive(flag) 
-        self.label4.set_sensitive(flag) 
-        self.button3.set_sensitive(flag) 
-        self.button4.set_sensitive(flag) 
-        self.overwriteBtn1.set_sensitive(flag) 
-        self.overwriteBtn2.set_sensitive(flag) 
+        self.label3.set_sensitive(flag)
+        self.label4.set_sensitive(flag)
+        self.button3.set_sensitive(flag)
+        self.button4.set_sensitive(flag)
+        self.overwriteBtn1.set_sensitive(flag)
+        self.overwriteBtn2.set_sensitive(flag)
 
     #about dialog
     def show_about(self, widget, data):
