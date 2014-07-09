@@ -132,4 +132,4 @@ Update Log
 
 ***
 ####2014-07-09 13:24
-+ 1.  Export: Bug in export filename fixed..  
++ 1.  Export: Bug in export filename fixed. 
