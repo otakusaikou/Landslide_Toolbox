@@ -136,4 +136,8 @@ Update Log
 
 ***
 ####2014-07-08 21:25
-+ 1.  All: Bug in reset item values fixed.
++ 1.  All: Bug in resetting item values fixed.  
+
+***
+####2014-07-09 15:02----------
++ 1.  Export: Bug in export filename fixed. 
