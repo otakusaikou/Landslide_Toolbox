@@ -42,7 +42,7 @@ Update Log
 + 1.  Zonal Split: Modify sql file, replace all '<NONE>' and NULL values with '_' in output result.  
 
 ***
-###2014-06-09 17:05+ ###
+###2014-06-09 17:05
 + 1.  Analysis: Change rasterizing pixel size from 1mx1m to 5mx5m.  
 
 ***
@@ -61,9 +61,9 @@ Update Log
 ***
 ###2014-06-27 10:36
 + 1.  Analysis:
-  -Ignore unused attributes like brightness and ndvi.  
-  -Add a new check button. Let user to choose whether to do all analysis process or just do coordinate transformation.  
-  -Delete unused commands.  
+  + Ignore unused attributes like brightness and ndvi.  
+  + Add a new check button. Let user to choose whether to do all analysis process or just do coordinate transformation.  
+  + Delete unused commands.  
 
 ***
 ###2014-06-28 03:20
@@ -101,8 +101,8 @@ Update Log
 ***
 ###2014-07-04 04:35
 + 1.  Analysis:   
-  -Output content of shapefile attribute 'project' modified.   
-  -Bug in loading raster data to remote database fixed.  
+  + Output content of shapefile attribute 'project' modified.   
+  + Bug in loading raster data to remote database fixed.  
 
 ***
 ###2014-07-04 14:45
