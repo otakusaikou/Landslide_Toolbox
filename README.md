@@ -121,11 +121,11 @@ Update Log
 + 1.  Upload: Bug in file encoding fixed.
 
 ***
-2014-07-07 00:10
+###2014-07-07 00:10
 + 1.  Upload: Change option "Existing Table" to "Use Big5 Encoding".
 
 ***
-2014-07-07 00:49
+###2014-07-07 00:49
 + 1.  Export: Bug in clean button fixed.
 
 ***
@@ -135,5 +135,5 @@ Update Log
 + 3.  All: Add compelete credit information.
 
 ***
-2014-07-08 21:25
+###2014-07-08 21:25
 + 1.  All: Bug in reset item values fixed.
