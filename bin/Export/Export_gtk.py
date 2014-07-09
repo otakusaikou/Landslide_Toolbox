@@ -13,6 +13,7 @@ import os
 import glob
 import psycopg2
 import sys
+import time
 
 class GUI(gtk.Window):
     def __init__(self, outputdir = os.path.join(os.getcwd(), "output")):
@@ -259,25 +260,6 @@ class GUI(gtk.Window):
         vbox2.show()###
         frame3.add(vbox2)
         
-        #hbox4 = gtk.HBox(False, 0)
-        #hbox4.show()###
-        #vbox2.pack_start(hbox4, True, False, 0)
-        
-        #label1 = gtk.Label("%s: " % split_field)
-        #hbox4.pack_start(label1, False, False, 10)
-        #label1.show()      
- 
-        #self.entry1 = gtk.Entry()
-        #self.entry1.set_size_request(250, 20)
-        #hbox4.pack_start(self.entry1, False, False, 0)
-        #self.entry1.set_sensitive(False)
-        #self.entry1.show()###
-        
-        #self.checkbutton1 = gtk.CheckButton("Split Shapefile By %s" % split_field)
-        #hbox4.pack_end(self.checkbutton1, False, False, 60)
-        #self.checkbutton1.set_sensitive(False)
-        #self.checkbutton1.show()###
-        
         hbox5 = gtk.HBox(False, 0)
         hbox5.show()###
         vbox2.pack_start(hbox5, True, False, 0)
@@ -459,29 +441,6 @@ class GUI(gtk.Window):
         else:
             sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query WHERE %s" % (statement)
 
-        #split results with date/year, but now is not available
-        #buffer = self.entry1.get_text().replace(" ", "").split(",")
-        #f_list = []
-        #if self.entry1.get_text().replace(" ", "") != "":
-        #    for element in buffer:
-        #        if len(str(element).split("-")) == 2:
-        #            for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
-        #                f_list.append(f)
-        #        else:
-        #            f_list.append(int(element))
-        #    f_list.sort()
-        #    tmp = ""
-        #    for i in range(len(f_list)):
-        #        if i == 0:
-        #            tmp += "%s = %d " % (split_field, f_list[i])
-        #        else:
-        #            tmp += "OR %s = %d " % (split_field, f_list[i])
-        #
-        #    if "WHERE" not in sql:
-        #        sql += "WHERE (" + tmp + ")"
-        #    else:
-        #        sql += "AND (" + tmp + ")"
-
         sql = sql.decode("utf-8")
         try:
             con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
@@ -505,14 +464,31 @@ class GUI(gtk.Window):
             
     def export(self, widget):
         count = 0
-        log = open("log.txt", "w")
+        log = open("log.txt", "a")
+        log.write("-"*34 + time.strftime("%Y%m%d_%H%M%S", time.gmtime()) + "-"*34 + "\n")
         textbuffer = self.textview.get_buffer()
         start = textbuffer.get_start_iter()
         end = textbuffer.get_end_iter()
         if self.entry2.get_text().replace(" ", "") == "":
-            outshp = table
+            messagedialog = gtk.MessageDialog(self, 
+                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
+                    gtk.BUTTONS_CLOSE, 'Invalid file name!')
+            log.write("Invalid file name!\n")
+            log.close()
+            messagedialog.set_position(gtk.WIN_POS_CENTER)
+            messagedialog.run()
+            messagedialog.destroy()
+            return
         else:
             outshp = self.entry2.get_text().replace(" ", "").encode("big5")
+            #rename file as filename_N if have same outputfile, N is a number
+            if os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                outshp = os.path.splitext(outshp)[0] + "_1.shp"
+                num = 2
+                #if still exists, increase the number of N
+                while os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                    outshp = os.path.splitext(outshp)[0][:-2] + "_%d.shp" % num
+                    num += 1
         
         statement = textbuffer.get_text(start, end)
         
@@ -522,85 +498,13 @@ class GUI(gtk.Window):
         #for the case that something input in SQL where expression textbox
         else:
             sql = "SELECT * FROM tmp_query WHERE %s" % statement
-            
-        #split results with date/year, but now is not available
-        #buffer = self.entry1.get_text().replace(" ", "").split(",")
-        #f_list = []
-        #for element in buffer:
-        #    if len(str(element).split("-")) == 2:
-        #        for f in [d for d in range(int(str(element.split("-")[0])), int(str(element.split("-")[1])) + 1)]:
-        #            f_list.append(f)
-        #    else:
-        #        if element != "":
-        #            f_list.append(int(element))
-        #f_list.sort()
-        
-        #if len(f_list) == 0:
-        #    cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
-        #    result = os.popen(cmdStr).read()
-        #    count += 1
-        #    log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
-        #    log.write(cmdStr + "\n")
-        #    log.write(result + "\n")
-        #    if "ERROR" in result or "Failed" in result:
-        #            count -= 1
-        #            try:
-        #                dllist = glob.glob(outshp + "*")
-        #                for file in dllist:
-        #                    os.remove(file)
-        #            except:
-        #                print "Can't remove error files!"
-        #
-        #else:
-        #    if self.checkbutton1.get_active():
-        #        for f in f_list:
-        #            if "where" not in sql:
-        #                tmpsql = sql + "where %s = %d " % (split_field, f)
-        #            else:
-        #                tmpsql = sql + " AND %s = %d" % (split_field, f)
-        #            cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + str(f) + ".shp", host, user, password, dbname, tmpsql.encode("big5")) 
-        #            result = os.popen(cmdStr).read()
-        #            count += 1
-        #            log.write("Generating shapefile %s...\n" % (outshp + str(f) + ".shp"))
-        #            log.write(cmdStr + "\n")
-        #            log.write(result + "\n")
-        #            if "ERROR" in result or "Failed" in result:
-        #                count -= 1
-        #                try:
-        #                    dllist = glob.glob(outshp + str(f) + "*")
-        #                    for file in dllist:
-        #                        os.remove(file)
-        #                except:
-        #                    print "Can't remove error files!"
-        #        
-        #    else:
-        #        tmp = ""
-        #        for i in range(len(f_list)):
-        #            if i == 0:
-        #                tmp += "%s = %d " % (split_field, f_list[i])
-        #            else:
-        #                tmp += "OR %s = %d " % (split_field, f_list[i])
-        #        if tmp != "":
-        #            if "where" not in sql:
-        #                sql += "where (" + tmp + ")"
-        #            else:
-        #                sql += "AND (" + tmp + ")"
-        #            
-        #        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp + ".shp", host, user, password, dbname, sql.encode("big5")) 
-        #        result = os.popen(cmdStr).read()
-        #        count += 1
-        #        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
-        #        log.write(cmdStr + "\n")
-        #        log.write(result + "\n")
-        #        if "ERROR" in result or "Failed" in result:
-        #            count -= 1
         
         if not outshp.endswith(".shp"):
             outshp += ".shp"
         cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp , host, user, password, dbname, sql.encode("big5")) 
         result = os.popen(cmdStr).read()
         count += 1
-        log.write("Generating shapefile %s...\n" % (outshp + ".shp"))
+        log.write("Generating shapefile %s...\n" % (outshp))
         log.write(cmdStr + "\n")
         log.write(result + "\n")
         if "ERROR" in result or "Failed" in result:
@@ -616,14 +520,11 @@ class GUI(gtk.Window):
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
                 gtk.BUTTONS_CLOSE, '1 shapefile have been generated.\n\nCheck the log file "log.txt" in output directory for more information.')
                 
+        log.write("-"*34 + time.strftime("%Y%m%d_%H%M%S", time.gmtime()) + "-"*34 + "\n")
         log.close()
         messagedialog.set_position(gtk.WIN_POS_CENTER)
         messagedialog.run()
         messagedialog.destroy()
-
-        
-        
-        
         
 def create_field_list():
     try:

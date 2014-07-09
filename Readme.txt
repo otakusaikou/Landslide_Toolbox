@@ -123,5 +123,9 @@ This program is a toolbox written for the following functions:
 -----------2014-07-07 22:15----------
 
 -----------2014-07-08 20:40----------
-1.All: Bug in reset item values fixed.
+1.All: Bug in resetting item values fixed.
 -----------2014-07-08 20:40----------
+
+-----------2014-07-09 13:24----------
+1.Export: Bug in export filename fixed..
+-----------2014-07-09 13:24----------
