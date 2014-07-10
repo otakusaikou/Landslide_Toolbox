@@ -18,10 +18,10 @@ class GUI:
     def __init__(self, inputdir = os.path.join(os.getcwd(), "input"), outputdir = os.path.join(os.getcwd(), "output")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Merge')
-        window.set_size_request(500, 270)
+        window.set_size_request(350, 250)
         window.connect('destroy', lambda w: gtk.main_quit())
 
-        mainbox = gtk.VBox(False, 0)
+        mainbox = gtk.VBox(False, 10)
         window.add(mainbox)
         mainbox.show()
         window.show()
@@ -44,53 +44,10 @@ class GUI:
         mainbox.pack_start(menubar, False, True, 0)
         menubar.show()
         
-    ##main hbox
-        hbox = gtk.HBox(False, 5)
-        mainbox.pack_start(hbox, True, False, 0)
-        hbox.show()
-        
-    ##I/O block
-        frame = gtk.Frame('Input/Output')
-        frame.set_border_width(10)
-        frame.set_size_request(350, 250)
-        leftvbox = gtk.VBox(False, 10)
-        frame.add(leftvbox)
-        hbox.pack_start(frame, False, False, 0)
-        leftvbox.set_border_width(10)
-        frame.show()
-        leftvbox.show()
-        
-    ##method block
-        frame = gtk.Frame('Methods')
-        frame.set_border_width(10)
-        frame.set_size_request(150, 250)
-        rightvbox = gtk.VBox(False, 10)
-        frame.add(rightvbox)
-        hbox.pack_start(frame, False, True, 0)
-        rightvbox.set_border_width(10)
-        frame.show()
-        rightvbox.show()
-        
-        self.methodMerge = gtk.RadioButton(None, "Merge")
-        self.methodMerge.set_active(True)
-        self.methodMerge.connect("toggled", self.changeMethod, "Merge")
-        rightvbox.pack_start(self.methodMerge, True, False, 0)
-        self.methodMerge.show()
-        
-        self.methodUnion = gtk.RadioButton(self.methodMerge, "Union")
-        self.methodUnion.connect("toggled", self.changeMethod, "Union")
-        rightvbox.pack_start(self.methodUnion, True, False, 0)
-        self.methodUnion.show()
-        
-        self.methodDissolve = gtk.RadioButton(self.methodUnion, "Dissolve")
-        self.methodDissolve.connect("toggled", self.changeMethod, "Dissolve")
-        rightvbox.pack_start(self.methodDissolve, True, False, 0)
-        self.methodDissolve.show()
-        
     ##input directory path
         label1 = gtk.Label("The input directory path...")
         hbox = gtk.HBox(False, 5)
-        leftvbox.pack_start(hbox, True, False, 5)
+        mainbox.pack_start(hbox, True, False, 0)
         hbox.pack_start(label1, False, True, 5)
         
         label1.show()
@@ -98,7 +55,7 @@ class GUI:
           
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
-        leftvbox.pack_start(hbox, True, False, 5)
+        mainbox.pack_start(hbox, True, False, 0)
         
         filter = gtk.FileFilter()
         filter.add_pattern("*.shp")
@@ -115,7 +72,7 @@ class GUI:
     ##separator
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
-        leftvbox.pack_start(hbox, True, False, 0)
+        mainbox.pack_start(hbox, True, False, 0)
         
         hsaparator = gtk.HSeparator()
         hbox.pack_start(hsaparator, True, True, 10)
@@ -126,7 +83,7 @@ class GUI:
     ##output directory path
         label2 = gtk.Label("The output directory path...")
         hbox = gtk.HBox(False, 5)
-        leftvbox.pack_start(hbox, True, False, 0)
+        mainbox.pack_start(hbox, True, False, 0)
         hbox.pack_start(label2, False, True, 5)  
         
         label2.show()
@@ -134,7 +91,7 @@ class GUI:
           
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(10)
-        leftvbox.pack_start(hbox, True, False, 0)
+        mainbox.pack_start(hbox, True, False, 0)
         
         self.button2 = gtk.FileChooserButton('Output directory')
         self.button2.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
@@ -143,12 +100,11 @@ class GUI:
         
         hbox.show()
         self.button2.show()
-        
 
     ##output file name
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(5)
-        leftvbox.pack_start(hbox, True, False, 10)
+        mainbox.pack_start(hbox, True, False, 0)
 
         label3 = gtk.Label("Output Name:")
         hbox.pack_start(label3, False, True, 5)  
@@ -163,7 +119,7 @@ class GUI:
     ##merge button box
         hbox = gtk.HBox(False, 0)
         hbox.set_border_width(5)
-        leftvbox.pack_start(hbox, True, False, 5)
+        mainbox.pack_start(hbox, True, False, 15)
         
         button = gtk.Button('Merge')
         button.connect('clicked', self.mergeButton)
@@ -201,15 +157,6 @@ class GUI:
            result = os.popen("python conf.py")
         os.chdir(cur)
 
-    def changeMethod(self, widget, event):
-        if event == "Dissolve":
-            self.entry1.set_sensitive(False)
-        elif event == "Union":
-            self.entry1.set_text("Union.shp")
-        else:
-            self.entry1.set_text("Merged.shp")
-            self.entry1.set_sensitive(True)       
-        
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()
         item_factory = gtk.ItemFactory(gtk.MenuBar, '<main>', accel_group)
@@ -222,7 +169,6 @@ class GUI:
         self.button1.set_current_folder(self.inputdir)
         self.button2.set_current_folder(self.outputdir)
         self.entry1.set_text("Merged.shp")
-        self.methodMerge.set_active(True)
         
     def reloadConfig(self):
         settings = open(configpath)
@@ -239,34 +185,26 @@ class GUI:
         self.reloadConfig()
         M = Merge(self.button1.get_filename(), self.button2.get_filename())
         
-        if self.methodDissolve.get_active():
-            msg, result, writelog, icon = M.dissolveAll()
-        else:
-            #check table name
-            filename = self.entry1.get_text()
-            valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-            filename = ''.join(c for c in filename if c in valid_chars)
-            if filename.replace(" ", "") == "":
-                msg, result, writelog, icon = "Invalid file name!", None, False, gtk.MESSAGE_WARNING
-                self.showMessage(msg, result, writelog, icon)
-                return
-            if not self.entry1.get_text().endswith(".shp"):
-                filename += ".shp"
-            
-            #rename file as filename_N if have same outputfile, N is a number
-            if os.path.exists(os.path.join(self.button2.get_filename(), filename)):
-                filename = os.path.splitext(filename)[0] + "_1.shp"
-                num = 2
-                #if still exists, increase the number of N
-                while os.path.exists(os.path.join(self.button2.get_filename(), filename)):
-                    filename = os.path.splitext(filename)[0][:-2] + "_%d.shp" % num
-                    num += 1
-            #check merge mode
-            #for normal merge
-            if self.methodMerge.get_active():
-                msg, result, writelog, icon = M.merge("normalMerge", filename)
-            elif self.methodUnion.get_active():
-                msg, result, writelog, icon = M.merge("unionOnly", filename)
+        #check table name
+        filename = self.entry1.get_text()
+        valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+        filename = ''.join(c for c in filename if c in valid_chars)
+        if filename.replace(" ", "") == "":
+            msg, result, writelog, icon = "Invalid file name!", None, False, gtk.MESSAGE_WARNING
+            self.showMessage(msg, result, writelog, icon)
+            return
+        if not self.entry1.get_text().endswith(".shp"):
+            filename += ".shp"
+        
+        #rename file as filename_N if have same outputfile, N is a number
+        if os.path.exists(os.path.join(self.button2.get_filename(), filename)):
+            filename = os.path.splitext(filename)[0] + "_1.shp"
+            num = 2
+            #if still exists, increase the number of N
+            while os.path.exists(os.path.join(self.button2.get_filename(), filename)):
+                filename = os.path.splitext(filename)[0][:-2] + "_%d.shp" % num
+                num += 1
+        msg, result, writelog, icon = M.merge(filename)
         
         self.showMessage(msg, result, writelog, icon)
 
@@ -337,87 +275,8 @@ class Merge:
         conn.commit()
         
         return result
-        
-    def dissolveAll(self):
-        tStart = time.time()
-        
-        result = ""
-        #connect to database
-        try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (dbname, user, host, passwords))
-            cur = conn.cursor()
-        except:
-            return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
-
-        #get shapefile list
-        os.chdir(self.inputdir)
-        shp_list = glob.glob("*.shp")
-        
-        #check if the inputdir is empty
-        if len(shp_list) == 0:
-            conn.close()
-            return "Can't find any shapefile in input directory.", result, False, gtk.MESSAGE_WARNING
-        
-        #dissolve all shapefiles
-        for shp_data in shp_list:
-            os.chdir(self.inputdir)
-            #import tables
-            try:
-                #clean old table t1, if exists for uploading new tables
-                cur.execute("DROP TABLE IF EXISTS t1;")
-                conn.commit()
-                
-                #import shapefiles to database
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
-                print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
-                result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
-                result += os.popen(cmdstr).read()
-                #Dissolve shapefile
-                print "Dissolve shapefile '%s'..." % shp_data
-                result += "Dissolve shapefile '%s'...\n" % shp_data
-                result += self.dissolve(cur, conn, "t1")
-                
-                #export result
-                try:
-                    os.chdir(self.outputdir)
-                    cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (shp_data, host, user, dbname)
-                    print "Export dissolved shapefile '%s'..." % shp_data
-                    result += "Export dissolved shapefile '%s'...\n" % shp_data
-                    result += os.popen(cmdstr).read()
-                            
-                    #delete template tables
-                    cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS T1_exp;DROP TABLE IF EXISTS T2_exp;DROP TABLE IF EXISTS T1_T2_combo;DROP TABLE IF EXISTS T1_T2_overlay;DROP TABLE IF EXISTS T1_T2_overlay_pts;DROP TABLE IF EXISTS T1_T2_unionjoin;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS unishp;")
-                    conn.commit()
-                    
-                except:
-                    #delete template tables
-                    conn.rollback()
-                    cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
-                    conn.commit()
-                    conn.close()
-                    return "Export data error.", result, True, gtk.MESSAGE_WARNING
-                               
-            except psycopg2.InternalError, e:
-                result += str(e)
-                #delete template tables
-                conn.rollback()
-                cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
-                conn.commit()
-                conn.close()
-                return "Dissolve shapefile data error.\nShapefile name is '%s'.\n" % shp_data, result, True, gtk.MESSAGE_WARNING
-        
-        print "All shapefile are dissolved successfully!"
-        result += "All shapefile are dissolved successfully!\n"
-               
-        #delete template tables
-        cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
-        conn.commit()
-        conn.close()
-        tEnd = time.time()
-        
-        return "Works done! It took %f sec" % (tEnd - tStart), result, True, gtk.MESSAGE_INFO
          
-    def merge(self, mode, filename):
+    def merge(self, filename):
         tStart = time.time()
         
         result = ""
@@ -462,14 +321,13 @@ class Merge:
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
            
-            if mode == "normalMerge": 
-                print "Dissolve shapefile '%s'..." % (shp_list[0])
-                result += "Dissolve shapefile '%s'...\n" % (shp_list[0])
-                result += self.dissolve(cur, conn, "t1")
-                
-                print "Dissolve shapefile '%s'..." % (shp_list[1])
-                result += "Dissolve shapefile '%s'...\n" % (shp_list[1])
-                result += self.dissolve(cur, conn, "t2")
+            print "Dissolve shapefile '%s'..." % (shp_list[0])
+            result += "Dissolve shapefile '%s'...\n" % (shp_list[0])
+            result += self.dissolve(cur, conn, "t1")
+            
+            print "Dissolve shapefile '%s'..." % (shp_list[1])
+            result += "Dissolve shapefile '%s'...\n" % (shp_list[1])
+            result += self.dissolve(cur, conn, "t2")
             
             #get intersection area (two tables, table1 and table2) and delete them from t1 and t2
             result += "Get intersection area of two shapefiles '%s' and '%s'...\n" % (shp_list[0], shp_list[1]) 
@@ -501,14 +359,13 @@ class Merge:
                     print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                     result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                     result += os.popen(cmdstr).read()
-                    if mode == "normalMerge": 
-                        print "Dissolve union table..." 
-                        result += "Dissolve union table...\n" 
-                        result += self.dissolve(cur, conn, "t1")
-                        
-                        print "Dissolve shapefile '%s'..." % (shp_data)
-                        result += "Dissolve shapefile '%s'...\n" % (shp_data)
-                        result += self.dissolve(cur, conn, "t2")
+                    print "Dissolve union table..." 
+                    result += "Dissolve union table...\n" 
+                    result += self.dissolve(cur, conn, "t1")
+                    
+                    print "Dissolve shapefile '%s'..." % (shp_data)
+                    result += "Dissolve shapefile '%s'...\n" % (shp_data)
+                    result += self.dissolve(cur, conn, "t2")
                     
                     #get intersection area (two tables, table1 and table2) and delete them from t1 and t2
                     result += "Get intersection area of union table and new shapefile '%s'...\n" % shp_data 
@@ -529,10 +386,9 @@ class Merge:
                     return "Import shapefile data error.\nShapefile name is '%s'.\n" % shp_data, result, True, gtk.MESSAGE_WARNING
         
         #dissolve union
-        if mode == "normalMerge":
-            print "Dissolve shapefile union..."
-            result += "Dissolve shapefile union...\n"
-            result += self.dissolve(cur, conn, "t1")
+        print "Dissolve shapefile union..."
+        result += "Dissolve shapefile union...\n"
+        result += self.dissolve(cur, conn, "t1")
         
         #export result
         try:
