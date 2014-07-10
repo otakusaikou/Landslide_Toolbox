@@ -25,8 +25,8 @@ GROUP BY T.project, T.dmcdate;
 
 DROP TABLE IF EXISTS TALL;
 CREATE TEMP TABLE TALL (gid serial PRIMARY KEY, project text, dmcdate date, geom geometry);
-INSERT INTO TALL (project, dmcdate, ST_Buffer(geom, 0))
- SELECT project, dmcdate, geom
+INSERT INTO TALL (project, dmcdate, geom)
+ SELECT project, dmcdate, ST_Buffer(geom, 0) AS geom
  FROM new_polys 
  WHERE ST_Area(geom) > 1000
  UNION (
