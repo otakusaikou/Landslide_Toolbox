@@ -133,3 +133,7 @@ Update Log
 ***
 ####2014-07-09 13:24
 + 1.  Export: Bug in export filename fixed. 
+
+***
+####2014-07-10 10:33
++ 1. Merge: Algorithm modified. Make the process simpler and more correct.
