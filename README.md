@@ -145,3 +145,7 @@ Update Log
 ***
 ####2014-07-10 09:50 
 + 1.  Merge: Algorithm modified. Make the process simpler and more correct.
+
+***
+####2014-07-10 10:36 
++ 1.  Merge: Let the ouput polygon area greater than 1000 square meters.
