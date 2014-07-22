@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/07/05
+Updated on 2014/07/22
 @author: Otakusaikou
 '''
 import os
@@ -208,11 +208,12 @@ class GUI:
     def reloadConfig(self):
         settings = open(configpath)
         lines = settings.readlines()
-        global host, dbname, user, passwords
+        global host, port, dbname, user, passwords
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
         
     def zonalSplitButton(self, widget):
@@ -278,7 +279,7 @@ class ZonalSplit:
         result = ""
         #connect to database
         try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (dbname, user, host, passwords))
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' port='%s' password='%s'" % (dbname, user, host, port, passwords))
             cur = conn.cursor()
         except:
             return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
@@ -307,7 +308,7 @@ class ZonalSplit:
         #import merged table
         try:
             #upload merged
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s merged | psql -h %s -d %s -U %s" % (shp_name, host, dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s merged | psql -h %s -p %s -d %s -U %s" % (shp_name, host, port, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_name, dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_name, dbname)
             result += os.popen(cmdstr).read()
@@ -329,7 +330,7 @@ class ZonalSplit:
             tablename = os.path.splitext(shp_data)[0]
             try:
                 #upload identity layer
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, tablename, host, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -p %s -d %s -U %s" % (shp_data, tablename, host, port, dbname, user)
                 print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                 result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                 result += os.popen(cmdstr).read()
@@ -359,7 +360,7 @@ class ZonalSplit:
         #export result
         try:
             os.chdir(self.outputdir)
-            cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT * FROM merged2"' % (filename, host, user, dbname)
+            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT * FROM merged2"' % (filename, host, port, user, dbname)
             print "Export final result..."
             result += "Export final result...\n"
             result += os.popen(cmdstr).read()
@@ -427,9 +428,10 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npasswords=mypassword")
         settings.close()
         host = "localhost"
+        port = "5432"
         dbname = "gis"
         user = "postgres"
         passwords = "mypassword"
@@ -438,8 +440,9 @@ if __name__ == '__main__':
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     main()

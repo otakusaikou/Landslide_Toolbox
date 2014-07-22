@@ -19,7 +19,7 @@ class GUI(gtk.Window):
     def __init__(self, outputdir = os.path.join(os.getcwd(), "output")):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.connect("delete_event", self.close_application)
-        window.set_size_request(700, 745)
+        window.set_size_request(700, 810)
         window.set_position(gtk.WIN_POS_CENTER)
         window.set_title("Export")
         window.show()
@@ -253,20 +253,189 @@ class GUI(gtk.Window):
         
         frame3 = gtk.Frame('Output Settings')
         frame3.show()###
-        frame3.set_size_request(680, 80)
+        frame3.set_size_request(680, 120)
         hbox3.pack_start(frame3, False, False, 10)
         
-        vbox2 = gtk.VBox(True, 0)
+        vbox2 = gtk.VBox(True, 15)
         vbox2.show()###
         frame3.add(vbox2)
+        
+        #Day, month, year spinbuttons
+        #Get latest and earliest date
+        try:
+            reloadConfig()
+            con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
+            cur = con.cursor()
+            sql = "SELECT DISTINCT MIN(project_date), MAX(project_date) FROM tmp_query WHERE project_date IS NOT NULL" 
+            cur.execute(sql)
+            
+        except psycopg2.DatabaseError, e:
+            print 'Could not open a database. Please check the config file: "Export.ini"'
+        results = cur.fetchall()
+        con.close()
+        fyear, fmon, fday = map(int, results[0][0].split("-"))
+        tyear, tmon, tday = map(int, results[0][1].split("-"))
+
+        hbox = gtk.HBox(False, 0)
+        hbox.set_border_width(5)
+        vbox2.pack_start(hbox, True, True, 5)
+        hbox.show()
+        
+        self.object_list = []
+        
+        #From
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("From :")
+        label.set_size_request(50, -1)
+        self.object_list.append(label)
+        label.set_alignment(0, 0.5)
+        label.show()
+        vbox.pack_start(label, False, False, 5)
+
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("Year :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(55, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+  
+        self.fyear_adj = gtk.Adjustment(fyear, 0.0, 2100.0, 1.0, 100.0, 0.0)
+        spinbutton = gtk.SpinButton(self.fyear_adj, 0, 0)
+        spinbutton.set_wrap(False)
+        spinbutton.show()
+        spinbutton.set_size_request(55, -1)
+        self.object_list.append(spinbutton)
+        vbox.pack_start(spinbutton, False, True, 0)
+
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+  
+        label = gtk.Label("Month :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(45, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+
+        self.fmon_adj = gtk.Adjustment(fmon, 1.0, 12.0, 1.0, 5.0, 0.0)
+        spinbutton = gtk.SpinButton(self.fmon_adj, 0, 0)
+        spinbutton.set_wrap(True)
+        spinbutton.set_size_request(45, -1)
+        self.object_list.append(spinbutton)
+        spinbutton.show()
+        vbox.pack_start(spinbutton, False, True, 0)
+  
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("Day :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(45, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+  
+        self.fday_adj = gtk.Adjustment(fday, 1.0, 31.0, 1.0, 5.0, 0.0)
+        spinbutton = gtk.SpinButton(self.fday_adj, 0, 0)
+        spinbutton.set_wrap(True)
+        spinbutton.set_size_request(45, -1)
+        self.object_list.append(spinbutton)
+        spinbutton.show()
+        vbox.pack_start(spinbutton, False, False, 0)
+
+        #To
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("To :")
+        label.set_alignment(0.5, 0.5)
+        label.set_size_request(50, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, False, 5)
+
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("Year :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(55, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+  
+        self.tyear_adj = gtk.Adjustment(tyear, 0.0, 2100.0, 1.0, 100.0, 0.0)
+        spinbutton = gtk.SpinButton(self.tyear_adj, 0, 0)
+        spinbutton.set_wrap(False)
+        spinbutton.show()
+        spinbutton.set_size_request(55, -1)
+        self.object_list.append(spinbutton)
+        vbox.pack_start(spinbutton, False, True, 0)
+  
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+  
+        label = gtk.Label("Month :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(45, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+
+        self.tmon_adj = gtk.Adjustment(tmon, 1.0, 12.0, 1.0, 5.0, 0.0)
+        spinbutton = gtk.SpinButton(self.tmon_adj, 0, 0)
+        spinbutton.set_wrap(True)
+        spinbutton.set_size_request(45, -1)
+        self.object_list.append(spinbutton)
+        spinbutton.show()
+        vbox.pack_start(spinbutton, False, True, 0)
+  
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_start(vbox, False, False, 5)
+        vbox.show()
+
+        label = gtk.Label("Day :")
+        label.set_alignment(0, 0.5)
+        label.set_size_request(45, -1)
+        self.object_list.append(label)
+        label.show()
+        vbox.pack_start(label, False, True, 0)
+  
+        self.tday_adj = gtk.Adjustment(tday, 1.0, 31.0, 1.0, 5.0, 0.0)
+        spinbutton = gtk.SpinButton(self.tday_adj, 0, 0)
+        spinbutton.set_wrap(True)
+        spinbutton.set_size_request(45, -1)
+        self.object_list.append(spinbutton)
+        spinbutton.show()
+        vbox.pack_start(spinbutton, False, False, 0)
+
+        vbox = gtk.VBox(False, 0)
+        hbox.pack_end(vbox, False, False, 5)
+        vbox.show()
+
+        self.checkbutton1 = gtk.CheckButton("Split Shapefile By Date")
+        vbox.pack_start(self.checkbutton1, False, False, 5)
+        self.checkbutton1.show()
         
         hbox5 = gtk.HBox(False, 0)
         hbox5.show()###
         vbox2.pack_start(hbox5, True, False, 0)
         
-        label2 = gtk.Label("Output Name: ")
-        hbox5.pack_start(label2, False, False, 10)
-        label2.show()      
+        label = gtk.Label("Output Name: ")
+        hbox5.pack_start(label, False, False, 10)
+        label.show()      
  
         self.entry2 = gtk.Entry()
         self.entry2.set_size_request(202, 20)
@@ -433,23 +602,29 @@ class GUI(gtk.Window):
         start = textbuffer.get_start_iter()
         end = textbuffer.get_end_iter()
         statement = textbuffer.get_text(start, end)
+
+        _from = "%04d-%02d-%02d" % (self.object_list[2].get_value(), self.object_list[4].get_value(), self.object_list[6].get_value())
+        _to = "%04d-%02d-%02d" % (self.object_list[9].get_value(), self.object_list[11].get_value(), self.object_list[13].get_value())
         
         #for the case that where statement is empty
         if statement.replace(" ", "") == "":
-            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query "
+            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query WHERE project_date >= '%s' AND project_date <= '%s'" % (_from, _to)
         #for the case that something input in SQL where expression textbox
         else:
-            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query WHERE %s" % (statement)
+            sql = "SELECT DISTINCT COUNT(slide_id) FROM tmp_query WHERE %s AND project_date >= '%s' AND project_date <= '%s'" % (statement, _from, _to)
 
         sql = sql.decode("utf-8")
         try:
-            con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
+            reloadConfig()
+            con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
             cur = con.cursor()
             cur.execute(sql)
             numrow = cur.fetchall()[0]
             messagedialog = gtk.MessageDialog(self, 
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
                 gtk.BUTTONS_CLOSE, "The where clause returned %d row(s)" % numrow)          
+
+            con.close()
         
         except psycopg2.DatabaseError, e:
             print sql
@@ -469,45 +644,112 @@ class GUI(gtk.Window):
         textbuffer = self.textview.get_buffer()
         start = textbuffer.get_start_iter()
         end = textbuffer.get_end_iter()
-        if self.entry2.get_text().replace(" ", "") == "":
-            messagedialog = gtk.MessageDialog(self, 
-                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
-                    gtk.BUTTONS_CLOSE, 'Invalid file name!')
-            log.write("Invalid file name!\n")
-            log.close()
-            messagedialog.set_position(gtk.WIN_POS_CENTER)
-            messagedialog.run()
-            messagedialog.destroy()
-            return
-        else:
-            outshp = self.entry2.get_text().replace(" ", "").encode("big5")
-            #rename file as filename_N if have same outputfile, N is a number
-            if os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
-                outshp = os.path.splitext(outshp)[0] + "_1.shp"
-                num = 2
-                #if still exists, increase the number of N
-                while os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
-                    outshp = os.path.splitext(outshp)[0][:-2] + "_%d.shp" % num
-                    num += 1
-        
+
         statement = textbuffer.get_text(start, end)
-        
-        #for the case that where statement is empty
-        if statement.replace(" ", "") == "":
-            sql = "SELECT * FROM tmp_query "
-        #for the case that something input in SQL where expression textbox
+        _from = "%04d-%02d-%02d" % (self.object_list[2].get_value(), self.object_list[4].get_value(), self.object_list[6].get_value())
+        _to = "%04d-%02d-%02d" % (self.object_list[9].get_value(), self.object_list[11].get_value(), self.object_list[13].get_value())
+
+        if self.checkbutton1.get_active():
+            #get all different dates
+            con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
+            cur = con.cursor()
+            cur.execute("SELECT DISTINCT project_date FROM tmp_query WHERE project >= '%s' AND project_date <= '%s'" % (_from, _to))
+            all_date = cur.fetchall()
+            con.close()
+
+            for date in all_date:
+                date = date[0]
+                #check file name 
+                if self.entry2.get_text().replace(" ", "") == "":
+                    messagedialog = gtk.MessageDialog(self, 
+                            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
+                            gtk.BUTTONS_CLOSE, 'Invalid file name!')
+                    log.write("Invalid file name!\n")
+                    log.close()
+                    messagedialog.set_position(gtk.WIN_POS_CENTER)
+                    messagedialog.run()
+                    messagedialog.destroy()
+                    return
+                else:
+                    outshp = self.entry2.get_text().replace(" ", "").encode("big5")
+                    if not outshp.endswith(".shp"):
+                        outshp += ".shp"
+                    f, e = os.path.splitext(outshp)
+                    outshp = f + date + e
+
+                    #rename file as filename_N if have same outputfile, N is a number
+                    if os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                        outshp = os.path.splitext(outshp)[0] + "_1.shp"
+                        num = 2
+                        #if still exists, increase the number of N
+                        while os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                            outshp = os.path.splitext(outshp)[0][:-2] + "_%d.shp" % num
+                            num += 1
+            
+                #for the case that where statement is empty
+                if statement.replace(" ", "") == "":
+                    sql = "SELECT * FROM tmp_query WHERE project_date = '%s'" % date
+                #for the case that something input in SQL where expression textbox
+                else:
+                    sql = "SELECT * FROM tmp_query WHERE %s AND project_date = '%s'" % (statement, date)
+                
+                cmdStr = 'pgsql2shp -f %s -h %s -u %s -p %s -P %s %s "%s"' % (outshp, host, user, port, password, dbname, sql.encode("big5")) 
+                result = os.popen(cmdStr).read()
+                count += 1
+                log.write("Generating shapefile %s...\n" % (outshp))
+                log.write(cmdStr + "\n")
+                log.write(result + "\n")
+                if "ERROR" in result or "Failed" in result:
+                    count -= 1
+                    try:
+                        dllist = glob.glob(f + date + "*")
+                        for file in dllist:
+                            os.remove(file)
+                    except:
+                        print "Can't remove error files!"
+                        
+                messagedialog = gtk.MessageDialog(self, 
+                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
+                        gtk.BUTTONS_CLOSE, '%d shapefile(s) have been generated.\n\nCheck the log file "log.txt" in output directory for more information.' % count)
         else:
-            sql = "SELECT * FROM tmp_query WHERE %s" % statement
-        
-        if not outshp.endswith(".shp"):
-            outshp += ".shp"
-        cmdStr = 'pgsql2shp -f %s -h %s -u %s -P %s %s "%s"' % (outshp , host, user, password, dbname, sql.encode("big5")) 
-        result = os.popen(cmdStr).read()
-        count += 1
-        log.write("Generating shapefile %s...\n" % (outshp))
-        log.write(cmdStr + "\n")
-        log.write(result + "\n")
-        if "ERROR" in result or "Failed" in result:
+            #check file name 
+            if self.entry2.get_text().replace(" ", "") == "":
+                messagedialog = gtk.MessageDialog(self, 
+                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_WARNING, 
+                        gtk.BUTTONS_CLOSE, 'Invalid file name!')
+                log.write("Invalid file name!\n")
+                log.close()
+                messagedialog.set_position(gtk.WIN_POS_CENTER)
+                messagedialog.run()
+                messagedialog.destroy()
+                return
+            else:
+                outshp = self.entry2.get_text().replace(" ", "").encode("big5")
+                if not outshp.endswith(".shp"):
+                    outshp += ".shp"
+
+                #rename file as filename_N if have same outputfile, N is a number
+                if os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                    outshp = os.path.splitext(outshp)[0] + "_1.shp"
+                    num = 2
+                    #if still exists, increase the number of N
+                    while os.path.exists(os.path.join(os.getcwd(), outshp)) or os.path.exists(os.path.join(os.getcwd(), outshp + ".shp")):
+                        outshp = os.path.splitext(outshp)[0][:-2] + "_%d.shp" % num
+                        num += 1
+            
+            #for the case that where statement is empty
+            if statement.replace(" ", "") == "":
+                sql = "SELECT * FROM tmp_query WHERE project_date >= '%s' AND project_date <= '%s'" % (_from, _to)
+            #for the case that something input in SQL where expression textbox
+            else:
+                sql = "SELECT * FROM tmp_query WHERE %s AND project_date >= '%s' AND project_date <= '%s'" % (statement, _from, _to)
+            cmdStr = 'pgsql2shp -f %s -h %s -u %s -p %s -P %s %s "%s"' % (outshp, host, user, port, password, dbname, sql.encode("big5")) 
+            result = os.popen(cmdStr).read()
+            count += 1
+            log.write("Generating shapefile %s...\n" % (outshp))
+            log.write(cmdStr + "\n")
+            log.write(result + "\n")
+            if "ERROR" in result or "Failed" in result:
                 count -= 1
                 try:
                     dllist = glob.glob(outshp + "*")
@@ -515,11 +757,11 @@ class GUI(gtk.Window):
                         os.remove(file)
                 except:
                     print "Can't remove error files!"
-                
-        messagedialog = gtk.MessageDialog(self, 
-                gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
-                gtk.BUTTONS_CLOSE, '1 shapefile have been generated.\n\nCheck the log file "log.txt" in output directory for more information.')
-                
+                    
+            messagedialog = gtk.MessageDialog(self, 
+                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
+                    gtk.BUTTONS_CLOSE, '1 shapefile have been generated.\n\nCheck the log file "log.txt" in output directory for more information.')
+                    
         log.write("-"*34 + time.strftime("%Y%m%d_%H%M%S", time.gmtime()) + "-"*34 + "\n")
         log.close()
         messagedialog.set_position(gtk.WIN_POS_CENTER)
@@ -528,7 +770,8 @@ class GUI(gtk.Window):
         
 def create_field_list():
     try:
-        con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
+        reloadConfig()
+        con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
         cur = con.cursor()
         sql = """
               DROP VIEW IF EXISTS tmp_query;
@@ -552,11 +795,12 @@ def create_field_list():
     if 'geom' in results:
         del results[results.index('geom')]
     
+    con.close()
     return results
 
 def get_records(fieldname, num):
     try:
-        con = psycopg2.connect(database = dbname, user = user, password = password, host = host)
+        con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
         cur = con.cursor()
         sql = "SELECT DISTINCT %s FROM tmp_query WHERE %s IS NOT NULL" % (fieldname, fieldname)
         cur.execute(sql)
@@ -565,6 +809,7 @@ def get_records(fieldname, num):
         print 'Could not open a database. Please check the config file: "Export.ini"'
     
     result = cur.fetchall()
+    con.close()
     
     if len(result) == 0:
         return [[], False]
@@ -587,6 +832,18 @@ def get_records(fieldname, num):
             result = [row[0] for row in result]
             result.sort()
             return [result, False]
+
+#read config file
+def reloadConfig():
+    settings = open(configpath)
+    lines = settings.readlines()
+    global host, port, dbname, user, passwords
+    host = lines[0].split("=")[-1].replace("\n", "")
+    port = lines[1].split("=")[-1].replace("\n", "")
+    dbname = lines[2].split("=")[-1].replace("\n", "")
+    user = lines[3].split("=")[-1].replace("\n", "")
+    passwords = lines[4].split("=")[-1].replace("\n", "")
+    settings.close()
         
 def main():
     os.environ["pgclientencoding"] = "big5"   
@@ -608,22 +865,21 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=landslide\nuser=postgres\npassword=mypassword\ndatefield=DMCDATE")
-        settings.close()
+        settings.write("host=localhost\nport=5432\ndbname=landslide\nuser=postgres\npassword=mypassword\n")
         host = "localhost"
+        port = "5432"
         dbname = "landslide"
         user = "postgres"
         password = "mypassword"
-        split_field = "DMCDATE"
         settings.close()
     else:
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        password = lines[3].split("=")[-1].replace("\n", "")
-        split_field = lines[4].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        password = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     
     if isDefault:

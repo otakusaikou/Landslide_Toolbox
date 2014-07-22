@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/25
-Updated on 2014/07/05
+Updated on 2014/07/22
 @author: Otakusaikou
 Description: This program is a GUI for uploading shapefile
 '''
@@ -173,11 +173,12 @@ class GUI:
     def reloadConfig(self):
         settings = open(configpath)
         lines = settings.readlines()
-        global host, dbname, user, passwords
+        global host, port, dbname, user, passwords
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
         
     #reset table name entry after file chooser dialog changed
@@ -204,7 +205,7 @@ class Upload:
         
         #connect to database
         try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (dbname, user, host, passwords))
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' port='%s' password='%s'" % (dbname, user, host, port, passwords))
         except:
             return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
         
@@ -223,7 +224,7 @@ class Upload:
             os.chdir(inputdir) #change current directory to target shapefile
             #check 'Use Big5 Encoding' option
             if checkbutton:
-                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -p %s -d %s -U %s" % (shp_data, self.tablename, host, port, dbname, user)
                 result += os.popen(cmdstr).read()
             else:
                 cmdstr = "shp2pgsql -s 3826 -c -D -I %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
@@ -258,9 +259,10 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npasswords=mypassword")
         settings.close()
         host = "localhost"
+        port = "5432"
         dbname = "gis"
         user = "postgres"
         passwords = "mypassword"
@@ -269,8 +271,9 @@ if __name__ == '__main__':
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     main()

@@ -10,11 +10,11 @@ import shapefile
 import glob
 import getEO
 import gdal
-import psycopg2
 import sys
 import numpy as np
 from math import sin, cos, pi, atan2, sqrt, degrees
-from gdalconst import *
+from gdalconst import GA_ReadOnly
+ 
 
 
 #---------img2map---------
@@ -214,7 +214,7 @@ def shpInRaster(shp_name, rasterlayer):
     return False
 
 
-def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, aspectlayer, overwriteAspect, host, database, user, password): #The variable inputdir here equals to outputdir in function img2map
+def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, aspectlayer, overwriteAspect, host, port, database, user, password): #The variable inputdir here equals to outputdir in function img2map
     result = ""
     #get shapefile list
     os.chdir(inputdir)
@@ -233,7 +233,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
                     cur.execute("DROP TABLE IF EXISTS slopelayer;")
                     conn.commit()
                 os.chdir(slopedir)
-                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -h %s -d %s -U %s" % (slopefile, host, database, user)
+                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 slopelayer | psql -h %s -p %s -d %s -U %s" % (slopefile, host, port, database, user)
                 print "Import raster data '%s' to database '%s' as table 'slopelayer'..." % (slopefile, database)
                 result += "Import raster data '%s' to database '%s' as table 'slopelayer'...\n" % (slopefile, database)
                 os.popen(cmdstr)
@@ -245,15 +245,15 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         cur.execute("SELECT EXISTS(SELECT relname FROM pg_class WHERE relname='aspectlayer')")
         exists = cur.fetchone()[0]
         if not exists or overwriteAspect:
-                if overwriteAspect:
-                    cur.execute("DROP TABLE IF EXISTS aspectlayer;")
-                    conn.commit()
-                os.chdir(aspectdir)
-                cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -h %s -d %s -U %s" % (aspectfile, host, database, user)
-                print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
-                result += "Import raster data '%s' to database '%s' as table 'aspectlayer'...\n" % (aspectfile, database)
-                os.popen(cmdstr)
-                os.chdir(inputdir)  #change directory to Toolbox\output\tmpdir
+            if overwriteAspect:
+                cur.execute("DROP TABLE IF EXISTS aspectlayer;")
+                conn.commit()
+            os.chdir(aspectdir)
+            cmdstr = "raster2pgsql -s 3826 -I -C -M %s -F -t 300x300 aspectlayer | psql -h %s -p %s -d %s -U %s" % (aspectfile, host, port, database, user)
+            print "Import raster data '%s' to database '%s' as table 'aspectlayer'..." % (aspectfile, database)
+            result += "Import raster data '%s' to database '%s' as table 'aspectlayer'...\n" % (aspectfile, database)
+            os.popen(cmdstr)
+            os.chdir(inputdir)  #change directory to Toolbox\output\tmpdir
     except:
         conn.close()
         result += "Import raster data error.\n"
@@ -282,7 +282,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
         
         #import new data
         try:
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s inputdata | psql -h %s -d %s -U %s" % (shp_data, host, database, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s inputdata | psql -h %s -p %s -d %s -U %s" % (shp_data, host, port, database, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_data, database)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, database)
             result += os.popen(cmdstr).read()
@@ -389,7 +389,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             #for riverside
             if nrow_riverside != 0:
                 os.chdir(os.path.join(outputdir, "RiverSide"))  #change directory to Toolbox\output\RiverSide
-                cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT * FROM riverside"' % (shp_data.replace("~", "_"), host, user, database)
+                cmdstr = 'pgsql2shp -f %s -h %s -u %s -p %s %s "SELECT * FROM riverside"' % (shp_data.replace("~", "_"), host, user, port, database)
                 print "Export riverside of shapefile '%s'..." % shp_data.replace("~", "_")
                 result += "Export riverside of shapefile '%s'...\n" % shp_data.replace("~", "_")
                 result += os.popen(cmdstr).read()
@@ -401,7 +401,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             #for landslide
             if nrow_landslide != 0:
                 os.chdir(os.path.join(outputdir, "Landslide"))  #change directory to Toolbox\output\Landslide
-                cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT * FROM vectordata"' % (shp_data.replace("~", "_"), host, user, database)
+                cmdstr = 'pgsql2shp -f %s -h %s -u %s -p %s %s "SELECT * FROM vectordata"' % (shp_data.replace("~", "_"), host, user, port, database)
                 print "Export landslide of shapefile '%s'..." % shp_data.replace("~", "_")
                 result += "Export landslide of shapefile '%s'...\n" % shp_data.replace("~", "_")
                 result += os.popen(cmdstr).read()

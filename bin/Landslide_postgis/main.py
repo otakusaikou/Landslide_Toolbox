@@ -243,14 +243,13 @@ class GUI:
     def reloadConfig(self):
         settings = open(configpath)
         lines = settings.readlines()
-        global host, database, user, password
+        global host, port, database, user, password
         host = lines[0].split("=")[-1].replace("\n", "")
-        database = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        password = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        database = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        password = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
-        settings.close()
-        
     
     def transform(self, widget):
         #read config file
@@ -330,7 +329,7 @@ class Analysis:
         result = ""
         #connect to database
         try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (database, user, host, password))
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' port='%s' password='%s'" % (database, user, host, port, password))
             cur = conn.cursor()
         except:
             return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
@@ -351,7 +350,7 @@ class Analysis:
             if not os.path.exists(os.path.join(self.outputdir, "Landslide")):
                 os.mkdir(os.path.join(self.outputdir, "Landslide")) 
             #landslide analysis
-            msg, result2, writelog, haveerror = landslide_analysis(conn, os.path.join(self.tmpdir, "landslide_97"), self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, database, user, password)
+            msg, result2, writelog, haveerror = landslide_analysis(conn, os.path.join(self.tmpdir, "landslide_97"), self.outputdir, self.slopelayer, overwriteSlope, self.aspectlayer, overwriteAspect, host, port, database, user, password)
         
             #update result
             result += result2
@@ -421,8 +420,9 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npassword=mypassword")
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npassword=mypassword")
         host = "localhost"
+        port = "port"
         database = "gis"
         user = "postgres"
         password = "mypassword"
@@ -431,8 +431,9 @@ if __name__ == '__main__':
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        database = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        password = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        database = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        password = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     main()

@@ -136,4 +136,9 @@ Update Log
 
 ***
 ####2014-07-10 10:33
-+ 1. Merge: Algorithm modified. Make the process simpler and more correct.
++ 1.  Merge: Algorithm modified. Make the process simpler and more correct.
+
+***
+####2014-07-22 17:18 
++ 1.  All:Add port entry in config setting panel.  
++ 2.  Export:Enable capibility of splitting shapefile by date attribute.  
