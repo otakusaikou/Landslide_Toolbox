@@ -653,7 +653,7 @@ class GUI(gtk.Window):
             #get all different dates
             con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
             cur = con.cursor()
-            cur.execute("SELECT DISTINCT project_date FROM tmp_query WHERE project >= '%s' AND project_date <= '%s'" % (_from, _to))
+            cur.execute("SELECT DISTINCT project_date FROM tmp_query WHERE project_date >= '%s' AND project_date <= '%s'" % (_from, _to))
             all_date = cur.fetchall()
             con.close()
 

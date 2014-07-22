@@ -154,3 +154,8 @@ Update Log
 ####2014-07-22 22:26 
 + 1.  All: Add port entry in config setting panel.
 + 2.  Export: Enable capibility of splitting shapefile by date attribute. 
+
+***
+####2014-07-23 00:07 
++ 1.  Export: Bug in exporting data fixed.  
+
