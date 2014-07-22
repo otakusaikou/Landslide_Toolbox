@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/07/05
+Updated on 2014/07/22
 @author: Otakusaikou
 '''
 import os
@@ -173,11 +173,12 @@ class GUI:
     def reloadConfig(self):
         settings = open(configpath)
         lines = settings.readlines()
-        global host, dbname, user, passwords
+        global host, port, dbname, user, passwords
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
         
     def mergeButton(self, widget):
@@ -282,7 +283,7 @@ class Merge:
         result = ""
         #connect to database
         try:
-            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' password='%s'" % (dbname, user, host, passwords))
+            conn = psycopg2.connect("dbname='%s' user='%s' host='%s' port='%s' password='%s'" % (dbname, user, host, port, passwords))
             cur = conn.cursor()
         except:
             return "Unable to connect to the database.\nCheck your config file.", result, True, gtk.MESSAGE_WARNING
@@ -310,13 +311,13 @@ class Merge:
         #import two tables
         try:
             #upload t1
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -d %s -U %s" % (shp_list[0], host, dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t1 | psql -h %s -p %s -d %s -U %s" % (shp_list[0], host, port, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[0], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[0], dbname)
             result += os.popen(cmdstr).read()
             
             #upload t2
-            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -d %s -U %s" % (shp_list[1], host, dbname, user)
+            cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -p %s -d %s -U %s" % (shp_list[1], host, port, dbname, user)
             print "Import shapefile '%s' to database '%s'..." % (shp_list[1], dbname)
             result += "Import shapefile '%s' to database '%s'...\n" % (shp_list[1], dbname)
             result += os.popen(cmdstr).read()
@@ -355,7 +356,7 @@ class Merge:
                 #import tables
                 try:
                     #upload t2
-                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -d %s -U %s" % (shp_data, host, dbname, user)
+                    cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s t2 | psql -h %s -p %s -d %s -U %s" % (shp_data, host, port, dbname, user)
                     print "Import shapefile '%s' to database '%s'..." % (shp_data, dbname)
                     result += "Import shapefile '%s' to database '%s'...\n" % (shp_data, dbname)
                     result += os.popen(cmdstr).read()
@@ -393,7 +394,7 @@ class Merge:
         #export result
         try:
             os.chdir(self.outputdir)
-            cmdstr = 'pgsql2shp -f %s -h %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, user, dbname)
+            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, port, user, dbname)
             print "Export merged landslide..."
             result += "Export merged landslide...\n"
             result += os.popen(cmdstr).read()
@@ -459,9 +460,9 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npasswords=mypassword")
-        settings.close()
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npasswords=mypassword")
         host = "localhost"
+        port = "5432"
         dbname = "gis"
         user = "postgres"
         passwords = "mypassword"
@@ -470,8 +471,9 @@ if __name__ == '__main__':
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        dbname = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        passwords = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     main()

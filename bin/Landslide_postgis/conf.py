@@ -1,12 +1,12 @@
 #/usr/bin/python27
 '''
 Created on 2013/06/20
-Updated on 2014/06/2
+Updated on 2014/07/22
 @author: Otakusaikou
 Description: This program is a GUI for config settings
 '''
 
-import os, pygtk, time, sys, psycopg2, glob
+import os, pygtk, sys
 pygtk.require('2.0')
 import gtk
 
@@ -14,7 +14,7 @@ class Config:
     def __init__(self): 
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title('Analysis Config Settings')
-        window.set_size_request(300, 270)
+        window.set_size_request(300, 300)
         window.connect('destroy', lambda w: gtk.main_quit())
 
         mainbox = gtk.VBox(False, 5)
@@ -38,9 +38,9 @@ class Config:
         self.entry1.show()
         self.entry1.set_text(host)
         hbox.pack_start(self.entry1, True, True, 0)
-        
-    ##database name
-        self.label2 = gtk.Label("Database Name")
+
+    ##port
+        self.label2 = gtk.Label("Port")
         hbox = gtk.HBox(False, 5)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
@@ -48,15 +48,15 @@ class Config:
         self.label2.set_size_request(110, 20)
         self.label2.show()
         hbox.pack_start(self.label2, False, False, 5)   
-        
+      
         self.entry2 = gtk.Entry()
         self.entry2.set_size_request(20, 25)
         self.entry2.show()
-        self.entry2.set_text(database)
+        self.entry2.set_text(port)
         hbox.pack_start(self.entry2, True, True, 0)
-    
-    ##user name
-        self.label3 = gtk.Label("User Name")
+        
+    ##database name
+        self.label3 = gtk.Label("Database Name")
         hbox = gtk.HBox(False, 5)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
@@ -64,15 +64,15 @@ class Config:
         self.label3.set_size_request(110, 20)
         self.label3.show()
         hbox.pack_start(self.label3, False, False, 5)   
-
+        
         self.entry3 = gtk.Entry()
         self.entry3.set_size_request(20, 25)
         self.entry3.show()
-        self.entry3.set_text(user)
+        self.entry3.set_text(database)
         hbox.pack_start(self.entry3, True, True, 0)
     
-    ##password
-        self.label4 = gtk.Label("Password")
+    ##user name
+        self.label4 = gtk.Label("User Name")
         hbox = gtk.HBox(False, 5)
         hbox.set_border_width(10)
         mainbox.pack_start(hbox, True, False, 5)
@@ -80,13 +80,29 @@ class Config:
         self.label4.set_size_request(110, 20)
         self.label4.show()
         hbox.pack_start(self.label4, False, False, 5)   
-          
+
         self.entry4 = gtk.Entry()
         self.entry4.set_size_request(20, 25)
-        self.entry4.set_text(password)
-        self.entry4.set_visibility(gtk.FALSE)
-        self.entry4.show() 
+        self.entry4.show()
+        self.entry4.set_text(user)
         hbox.pack_start(self.entry4, True, True, 0)
+    
+    ##password
+        self.label5 = gtk.Label("Password")
+        hbox = gtk.HBox(False, 5)
+        hbox.set_border_width(10)
+        mainbox.pack_start(hbox, True, False, 5)
+        hbox.show()
+        self.label5.set_size_request(110, 20)
+        self.label5.show()
+        hbox.pack_start(self.label5, False, False, 5)   
+          
+        self.entry5 = gtk.Entry()
+        self.entry5.set_size_request(20, 25)
+        self.entry5.set_text(password)
+        self.entry5.set_visibility(gtk.FALSE)
+        self.entry5.show() 
+        hbox.pack_start(self.entry5, True, True, 0)
     
     ##check button box
         hbox = gtk.HBox(False, 0)
@@ -97,7 +113,7 @@ class Config:
         self.showpasswordbtn.set_active(False)
         self.showpasswordbtn.connect("toggled", self.changeVisibility)
         self.showpasswordbtn.show()
-        hbox.pack_end(self.showpasswordbtn, False, False, 15)
+        hbox.pack_end(self.showpasswordbtn, False, False, 35)
 
     ##separator
         hbox = gtk.HBox(False, 0)
@@ -135,13 +151,13 @@ class Config:
         button.show()
     
     def changeVisibility(self, widget):
-        self.entry4.set_visibility(not self.entry4.get_visibility())
+        self.entry5.set_visibility(not self.entry5.get_visibility())
         
 
     def change(self, widget, tag):
         try:
             settings = open(configpath, "w")
-            settings.write("host=%s\ndbname=%s\nuser=%s\npassword=%s" % (self.entry1.get_text(), self.entry2.get_text(), self.entry3.get_text(), self.entry4.get_text()))
+            settings.write("host=%s\nport=%s\ndbname=%s\nuser=%s\npassword=%s" % (self.entry1.get_text(), self.entry2.get_text(), self.entry3.get_text(), self.entry4.get_text(), self.entry5.get_text()))
             settings.close()
             messagedialog = gtk.MessageDialog(None, 
                 gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
@@ -158,8 +174,6 @@ class Config:
             messagedialog.destroy()
         if tag == 1:
             gtk.main_quit()
-        
-        
 
 def main():
     Config()
@@ -180,8 +194,9 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\ndbname=gis\nuser=postgres\npassword=mypassword")
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npassword=mypassword")
         host = "localhost"
+        port = "5432"
         database = "gis"
         user = "postgres"
         password = "mypassword"
@@ -190,8 +205,9 @@ if __name__ == '__main__':
         settings = open(configpath)
         lines = settings.readlines()
         host = lines[0].split("=")[-1].replace("\n", "")
-        database = lines[1].split("=")[-1].replace("\n", "")
-        user = lines[2].split("=")[-1].replace("\n", "")
-        password = lines[3].split("=")[-1].replace("\n", "")
+        port = lines[1].split("=")[-1].replace("\n", "")
+        database = lines[2].split("=")[-1].replace("\n", "")
+        user = lines[3].split("=")[-1].replace("\n", "")
+        password = lines[4].split("=")[-1].replace("\n", "")
         settings.close()
     main()

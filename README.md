@@ -149,3 +149,8 @@ Update Log
 ***
 ####2014-07-10 10:36 
 + 1.  Merge: Let the ouput polygon area greater than 1000 square meters.
+
+***
+####2014-07-22 22:26 
++ 1.  All: Add port entry in config setting panel.
++ 2.  Export: Enable capibility of splitting shapefile by date attribute. 
