@@ -147,3 +147,7 @@ Update Log
 ####2014-07-22 23:49 
 + 1.  Upload: Bug in loading shapefile without using big5 encoding fixed.  
 + 2.  Analysis, Merge, ZonalSplit: Change default database name to gis.   
+
+***
+####2014-07-22 23:14 
++ 1.  Export: Bug in exporting data fixed.  
