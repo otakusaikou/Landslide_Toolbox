@@ -422,7 +422,7 @@ if __name__ == '__main__':
         settings = open(configpath, "w")
         settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npassword=mypassword")
         host = "localhost"
-        port = "port"
+        port = "5432"
         database = "gis"
         user = "postgres"
         password = "mypassword"

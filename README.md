@@ -140,5 +140,10 @@ Update Log
 
 ***
 ####2014-07-22 17:18 
-+ 1.  All:Add port entry in config setting panel.  
-+ 2.  Export:Enable capibility of splitting shapefile by date attribute.  
++ 1.  All: Add port entry in config setting panel.  
++ 2.  Export: Enable capibility of splitting shapefile by date attribute.  
+
+***
+####2014-07-22 23:49 
++ 1.  Upload: Bug in loading shapefile without using big5 encoding fixed.  
++ 2.  Analysis, Merge, ZonalSplit: Change default database name to gis.   

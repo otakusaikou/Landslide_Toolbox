@@ -194,10 +194,10 @@ if __name__ == '__main__':
     #read config file
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
-        settings.write("host=localhost\nport=5432\ndbname=landslide\nuser=postgres\npassword=mypassword")
+        settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npassword=mypassword")
         host = "localhost"
         port = "5432"
-        database = "landslide"
+        database = "gis"
         user = "postgres"
         password = "mypassword"
         settings.close()

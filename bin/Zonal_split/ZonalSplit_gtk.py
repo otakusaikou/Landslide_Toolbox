@@ -429,7 +429,6 @@ if __name__ == '__main__':
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
         settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npasswords=mypassword")
-        settings.close()
         host = "localhost"
         port = "5432"
         dbname = "gis"

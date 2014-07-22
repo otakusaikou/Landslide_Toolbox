@@ -227,7 +227,7 @@ class Upload:
                 cmdstr = "shp2pgsql -s 3826 -c -D -I -W big5 %s %s | psql -h %s -p %s -d %s -U %s" % (shp_data, self.tablename, host, port, dbname, user)
                 result += os.popen(cmdstr).read()
             else:
-                cmdstr = "shp2pgsql -s 3826 -c -D -I %s %s | psql -h %s -d %s -U %s" % (shp_data, self.tablename, host, dbname, user)
+                cmdstr = "shp2pgsql -s 3826 -c -D -I %s %s | psql -h %s -p %s -d %s -U %s" % (shp_data, self.tablename, host, port, dbname, user)
                 result += os.popen(cmdstr).read()
 
             #check if target table exists 
@@ -260,7 +260,6 @@ if __name__ == '__main__':
     if not os.path.exists(configpath):
         settings = open(configpath, "w")
         settings.write("host=localhost\nport=5432\ndbname=gis\nuser=postgres\npasswords=mypassword")
-        settings.close()
         host = "localhost"
         port = "5432"
         dbname = "gis"
