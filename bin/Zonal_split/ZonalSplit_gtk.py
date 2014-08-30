@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/07/22
+Updated on 2014/08/30
 @author: Otakusaikou
 '''
 import os
@@ -364,7 +364,42 @@ class ZonalSplit:
             print "Export final result..."
             result += "Export final result...\n"
             result += os.popen(cmdstr).read()
-                      
+
+            #write out statistic report
+            layer_list = [("Working Circle", "working_id", "working_ci"), ("Forest District", "forest_id", "forest_dis"), ("County", "county_id", "county"), ("Township", "town_id", "township"), ("Reservoir", "reserv_id", "reservoir"), ("Watershed", "watersh_id", "watershed"), ("Basin", "basin_id", "basin")]
+
+
+            fout = open("Statistics.txt", "w")
+            fout.write("Statistic Report\n")
+            fout.write("Record time: " + time.strftime("%Y/%m/%d %H:%M:%S", time.gmtime()) + "\n\n")
+            #get statistic data from database
+            cur.execute("""
+            SELECT SUM(area), AVG(area), MAX(area), MIN(area), COUNT(*)
+            FROM merged2
+            """)
+            ans = cur.fetchall()
+            fout.write("{:{fill}{align}60}".format("All", fill = "-", align = "^") + "\n")
+            fout.write("%-20s%-20s%-20s%-20s%-5s\n" % ("Sum Area (m^2)", "Average Area (m^2)", "Max Area (m^2)", "Min Area (m^2)", "Number of Landslide")) 
+            fout.write("%-20f%-20f%-20f%-20f%-5d\n" % ans[0]) 
+            fout.write("{:{fill}{align}60}".format("All", fill = "-", align = "^") + "\n\n")
+
+            sql = """
+            SELECT %s, %s, SUM(area), AVG(area), MAX(area), MIN(area), COUNT(*)
+            FROM merged2
+            GROUP BY %s, %s;
+            """
+
+            for layer in layer_list:
+                cur.execute(sql % (layer[1:]*2))
+                ans = cur.fetchall()
+                fout.write("{:{fill}{align}60}".format(layer[0], fill = "-", align = "^") + "\n")
+                fout.write("%-10s%-25s%-20s%-20s%-20s%-20s%-5s\n" % ("Layer ID", "Layer Name", "Sum Area (m^2)", "Average Area (m^2)", "Max Area (m^2)", "Min Area (m^2)", "Number of Landslide")) 
+                for row in ans:
+                    fout.write("%-10s%-25s%-20f%-20f%-20f%-20f%-5d\n" % row)
+                fout.write("{:{fill}{align}60}".format(layer[0], fill = "-", align = "^") + "\n\n")
+
+            fout.close()
+
             #delete template tables
             cur.execute("DROP TABLE IF EXISTS merged;DROP TABLE IF EXISTS merged2;DROP SEQUENCE IF EXISTS GEOM_ID;" + ";".join(["DROP TABLE IF EXISTS %s" % os.path.splitext(shp_data)[0] for shp_data in shp_list]))
             conn.commit()
