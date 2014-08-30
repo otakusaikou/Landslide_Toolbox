@@ -159,3 +159,7 @@ Update Log
 ####2014-07-23 00:07 
 + 1.  Export: Bug in exporting data fixed.  
 
+***
+####2014-08-30 11:14 
++ 1.  Zonal Split: Add function for generating statistic report after analysis is done.   
+
