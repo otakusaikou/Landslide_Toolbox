@@ -156,3 +156,8 @@ Update Log
 ####2014-08-30 21:41
 + 1. Zonal Split: Add function for generating statistic report after analysis is done.
 
+***
+####2014-09-13 23:17
++ 1. Export, Analysis, Merge, Zonal Split: Delete attribute 'project'.  
++ 1. Toolbox: Add message dialog to prompt users if they trying to terminate the toolbox while other subprocess still running.  
+

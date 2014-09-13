@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/07/22
+Updated on 2014/09/13
 @author: Otakusaikou
 '''
 import os
@@ -263,11 +263,11 @@ class Merge:
             threshold *= 10
 
         #get intersetion attributes from input table and unishp table
-        cur.execute("SELECT U.gid AS gid, t1.project AS project, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.project, t1.dmcdate;".replace("t1", tablename))
+        cur.execute("SELECT U.gid AS gid, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.dmcdate;".replace("t1", tablename))
         ans = cur.fetchall()
-        sql = "ALTER TABLE unishp ADD COLUMN project text; ALTER TABLE unishp ADD COLUMN dmcdate date;"
+        sql = "ALTER TABLE unishp ADD COLUMN dmcdate date;"
         for i in range(len(ans)):
-            sql += "UPDATE unishp SET (project, dmcdate) = ('%s', '%s'\n) WHERE gid = %d;\n" % (ans[i][1], str(ans[i][2]), ans[i][0])
+            sql += "UPDATE unishp SET dmcdate = '%s'\n WHERE gid = %d;\n" % (str(ans[i][1]), ans[i][0])
         cur.execute(sql)
         conn.commit()
         
@@ -344,6 +344,7 @@ class Merge:
         except:
             #delete template tables
             conn.rollback()
+            cur.execute(open(os.path.join(mergepath, "reference_data", "fastunion.sql"), "r").read())
             cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
             conn.commit()
             conn.close()
@@ -393,7 +394,7 @@ class Merge:
         #export result
         try:
             os.chdir(self.outputdir)
-            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, port, user, dbname)
+            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT geom, gid AS shp_id, dmcdate FROM t1 ORDER BY gid"' % (filename, host, port, user, dbname)
             print "Export merged landslide..."
             result += "Export merged landslide...\n"
             result += os.popen(cmdstr).read()

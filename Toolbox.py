@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/21
-Updated on 2014/07/04
+Updated on 2014/09/13
 @author: Otakusaikou
 '''
 import pygtk
@@ -90,12 +90,24 @@ class ToolBox:
 
     #close button 
     def close_button_event(self, widget, toolbar=None):
-        #turn off every subprocess if close button clicked
+        #check whether all the subprocess are terminated
+        if None in map(lambda p: p.poll(), self.subproc):
+            messagedialog = gtk.MessageDialog(None, 
+                gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
+                gtk.BUTTONS_YES_NO, "There still have subprocess running, are you sure you want to close all of them?") 
+            messagedialog.set_position(gtk.WIN_POS_CENTER)
+            response = messagedialog.run()
+            messagedialog.destroy()
+            if response == gtk.RESPONSE_NO:
+                return
+
+        #turn off every subprocess 
         try:
             for p in self.subproc:
                 p.terminate()
         except:
             pass
+
         gtk.main_quit()
     #config setting menu    
     def config_menu(self, widget, data):
@@ -123,11 +135,24 @@ class ToolBox:
             os.chdir(root)
         #quit event 
         elif label == "_Quit":
+            #check whether all the subprocess are terminated
+            if None in map(lambda p: p.poll(), self.subproc):
+                messagedialog = gtk.MessageDialog(None, 
+                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
+                    gtk.BUTTONS_YES_NO, "Still have subprocess running, are you sure you want to close all of them?") 
+                messagedialog.set_position(gtk.WIN_POS_CENTER)
+                response = messagedialog.run()
+                messagedialog.destroy()
+                if response == gtk.RESPONSE_NO:
+                    return
+
+            #turn off every subprocess 
             try:
                 for p in self.subproc:
                     p.terminate()
             except:
                 pass
+
             gtk.main_quit()
 
     #about dialog

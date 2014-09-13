@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2013/08/15
-Updated on 2014/05/25
+Updated on 2014/09/13
 @author: Otakusaikou
 '''
 import os
@@ -52,7 +52,6 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
     fields = sf.fields
     records = sf.records()
     fields.insert(2, ['DMCDate', 'D'])
-    fields.insert(2, ['Project', 'C', 10, 0])
 
     shpOut = shapefile.Writer(shapefile.POLYGON)
     
@@ -128,10 +127,6 @@ def readPoly(fileName, m11, m12, m13, m21, m22, m23, m31, m32, m33, xL, yL, zL, 
 
         shpOut.poly(partsOut)
         records[nShape].insert(1, date)
-        if fileName.startswith("0") or fileName.startswith("1"):
-            records[nShape].insert(1, "20" + fileName.replace("~", "_")[0:7])
-        else:
-            records[nShape].insert(1, "19" + fileName.replace("~", "_")[0:7])
         rec = records[nShape]
         
         shpOut.record(*rec)
