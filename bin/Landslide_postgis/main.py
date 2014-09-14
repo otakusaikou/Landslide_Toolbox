@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/08/15
-Updated on 2014/07/05
+Updated on 2014/09/14
 @author: Otakusaikou
 Description: This program is a GUI version of two shp file processor
 '''
@@ -60,7 +60,7 @@ class GUI:
         dialog.set_comments("This program is witten for coordinate transformation and filtering of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(analysispath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(analysispath, "Img\\logo.png")))
 
         #show dialog
         dialog.run()

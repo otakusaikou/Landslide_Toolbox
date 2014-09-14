@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/21
-Updated on 2014/09/13
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 import pygtk
@@ -166,7 +166,7 @@ class ToolBox:
         dialog.set_comments("This program is witten for preprocessing of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\Img\\ncculogo.png"))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file("bin\\Img\\logo.png"))
 
         #show dialog
         dialog.run()

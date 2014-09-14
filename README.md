@@ -161,3 +161,6 @@ Update Log
 + 1. Export, Analysis, Merge, Zonal Split: Delete attribute 'project'.  
 + 1. Toolbox: Add message dialog to prompt users if they trying to terminate the toolbox while other subprocess still running.  
 
+***
+####2014-09-14 11:18
++ 1. All: Logo in help dialog has been changed.  

@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/10/15
-Updated on 2014/09/13
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 #The GUI for Db_extractor.
@@ -495,7 +495,7 @@ class GUI(gtk.Window):
         dialog.set_comments("This program is witten for export of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img\\logo.png")))
 
         #show dialog
         dialog.run()

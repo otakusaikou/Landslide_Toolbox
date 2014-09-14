@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/09/13
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 import os
@@ -140,7 +140,7 @@ class GUI:
         dialog.set_comments("This program is witten for merge and dissolve of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img\\ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img\\logo.png")))
 
         #show dialog
         dialog.run()
@@ -344,7 +344,6 @@ class Merge:
         except:
             #delete template tables
             conn.rollback()
-            cur.execute(open(os.path.join(mergepath, "reference_data", "fastunion.sql"), "r").read())
             cur.execute("DROP SEQUENCE IF EXISTS GEO_ID;DROP TABLE IF EXISTS table2;DROP TABLE IF EXISTS table1;DROP TABLE IF EXISTS unishp;DROP TABLE IF EXISTS t1;DROP TABLE IF EXISTS t2;DROP TABLE IF EXISTS t1t;DROP TABLE IF EXISTS t2t;")
             conn.commit()
             conn.close()
