@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/07/22
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 import os
@@ -140,7 +140,7 @@ class GUI:
         dialog.set_comments("This program is witten for merge and dissolve of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img/ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(mergepath, "Img/logo.png")))
 
         #show dialog
         dialog.run()
@@ -174,11 +174,11 @@ class GUI:
         settings = open(configpath)
         lines = settings.readlines()
         global host, port, dbname, user, passwords
-        host = lines[0].split("=")[-1].replace("\n", "")
-        port = lines[1].split("=")[-1].replace("\n", "")
-        dbname = lines[2].split("=")[-1].replace("\n", "")
-        user = lines[3].split("=")[-1].replace("\n", "")
-        passwords = lines[4].split("=")[-1].replace("\n", "")
+        host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+        port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+        user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
         settings.close()
         
     def mergeButton(self, widget):
@@ -264,11 +264,11 @@ class Merge:
             threshold *= 10
 
         #get intersetion attributes from input table and unishp table
-        cur.execute("SELECT U.gid AS gid, t1.project AS project, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.project, t1.dmcdate;".replace("t1", tablename))
+        cur.execute("SELECT U.gid AS gid, t1.dmcdate AS dmcdate FROM t1, unishp U WHERE ST_Intersects(t1.geom, U.geom) GROUP BY U.gid, t1.dmcdate;".replace("t1", tablename))
         ans = cur.fetchall()
-        sql = "ALTER TABLE unishp ADD COLUMN project text; ALTER TABLE unishp ADD COLUMN dmcdate date;"
+        sql = "ALTER TABLE unishp ADD COLUMN dmcdate date;"
         for i in range(len(ans)):
-            sql += "UPDATE unishp SET (project, dmcdate) = ('%s', '%s'\n) WHERE gid = %d;\n" % (ans[i][1], str(ans[i][2]), ans[i][0])
+            sql += "UPDATE unishp SET dmcdate = '%s'\n WHERE gid = %d;\n" % (str(ans[i][1]), ans[i][0])
         cur.execute(sql)
         conn.commit()
         
@@ -394,7 +394,7 @@ class Merge:
         #export result
         try:
             os.chdir(self.outputdir)
-            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT geom, gid AS shp_id, project, dmcdate FROM t1 ORDER BY gid"' % (filename, host, port, user, dbname)
+            cmdstr = 'pgsql2shp -f %s -h %s -p %s -u %s %s "SELECT geom, gid AS shp_id, dmcdate FROM t1 ORDER BY gid"' % (filename, host, port, user, dbname)
             print "Export merged landslide..."
             result += "Export merged landslide...\n"
             result += os.popen(cmdstr).read()
@@ -470,10 +470,10 @@ if __name__ == '__main__':
     else:
         settings = open(configpath)
         lines = settings.readlines()
-        host = lines[0].split("=")[-1].replace("\n", "")
-        port = lines[1].split("=")[-1].replace("\n", "")
-        dbname = lines[2].split("=")[-1].replace("\n", "")
-        user = lines[3].split("=")[-1].replace("\n", "")
-        passwords = lines[4].split("=")[-1].replace("\n", "")
+        host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+        port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+        user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
         settings.close()
     main()

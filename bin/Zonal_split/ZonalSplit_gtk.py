@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/05/02
-Updated on 2014/08/30
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 import os
@@ -174,7 +174,7 @@ class GUI:
         dialog.set_comments("This program is witten for getting position attributes of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(zonpath, "Img/ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(zonpath, "Img/logo.png")))
 
         #show dialog
         dialog.run()
@@ -209,11 +209,11 @@ class GUI:
         settings = open(configpath)
         lines = settings.readlines()
         global host, port, dbname, user, passwords
-        host = lines[0].split("=")[-1].replace("\n", "")
-        port = lines[1].split("=")[-1].replace("\n", "")
-        dbname = lines[2].split("=")[-1].replace("\n", "")
-        user = lines[3].split("=")[-1].replace("\n", "")
-        passwords = lines[4].split("=")[-1].replace("\n", "")
+        host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+        port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+        user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
         settings.close()
         
     def zonalSplitButton(self, widget):
@@ -473,10 +473,10 @@ if __name__ == '__main__':
     else:
         settings = open(configpath)
         lines = settings.readlines()
-        host = lines[0].split("=")[-1].replace("\n", "")
-        port = lines[1].split("=")[-1].replace("\n", "")
-        dbname = lines[2].split("=")[-1].replace("\n", "")
-        user = lines[3].split("=")[-1].replace("\n", "")
-        passwords = lines[4].split("=")[-1].replace("\n", "")
+        host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+        port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+        user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+        passwords = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
         settings.close()
     main()

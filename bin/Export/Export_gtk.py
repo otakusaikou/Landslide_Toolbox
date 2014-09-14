@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/10/15
-Updated on 2014/07/22
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 #The GUI for Db_extractor.
@@ -495,7 +495,7 @@ class GUI(gtk.Window):
         dialog.set_comments("This program is witten for export of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img/ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(exportpath, "Img/logo.png")))
 
         #show dialog
         dialog.run()
@@ -776,10 +776,10 @@ def create_field_list():
               DROP VIEW IF EXISTS tmp_query;
               CREATE VIEW tmp_query AS
               SELECT *
-              FROM (SELECT slide_id, project_name AS project, project_date::text, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y, geom
+              FROM (SELECT slide_id, project_date::text, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y, geom
                     FROM slide_area, project, admin_area, working_circle, reservoir, watershed, forest_district, basin
                     WHERE project_no = project_id AND county_no = county_id AND town_no = town_id AND workingcircle_no = workingcircle_id AND reservoir_no = reservoir_id AND water_no = water_id AND forest_no = forest_id AND basin_no = basin_id
-                    GROUP BY slide_id, geom, project_name, project_date, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y) AS T
+                    GROUP BY slide_id, geom, project_date, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y) AS T
         """
         cur.execute(sql)
         con.commit()
@@ -837,11 +837,11 @@ def reloadConfig():
     settings = open(configpath)
     lines = settings.readlines()
     global host, port, dbname, user, passwords
-    host = lines[0].split("=")[-1].replace("\n", "")
-    port = lines[1].split("=")[-1].replace("\n", "")
-    dbname = lines[2].split("=")[-1].replace("\n", "")
-    user = lines[3].split("=")[-1].replace("\n", "")
-    passwords = lines[4].split("=")[-1].replace("\n", "")
+    host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+    port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+    dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+    user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+    passwords = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
     settings.close()
         
 def main():
@@ -875,11 +875,11 @@ if __name__ == '__main__':
     else:
         settings = open(configpath)
         lines = settings.readlines()
-        host = lines[0].split("=")[-1].replace("\n", "")
-        port = lines[1].split("=")[-1].replace("\n", "")
-        dbname = lines[2].split("=")[-1].replace("\n", "")
-        user = lines[3].split("=")[-1].replace("\n", "")
-        password = lines[4].split("=")[-1].replace("\n", "")
+        host = lines[0].split("=")[-1].replace("\n", "").replace("\r", "")
+        port = lines[1].split("=")[-1].replace("\n", "").replace("\r", "")
+        dbname = lines[2].split("=")[-1].replace("\n", "").replace("\r", "")
+        user = lines[3].split("=")[-1].replace("\n", "").replace("\r", "")
+        password = lines[4].split("=")[-1].replace("\n", "").replace("\r", "")
         settings.close()
     
     if isDefault:

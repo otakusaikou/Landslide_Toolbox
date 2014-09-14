@@ -16,7 +16,6 @@ HAVING AVG((ST_SummaryStats(ST_Clip(rast,1,geom, True))).mean) > 17;
 CREATE TEMP TABLE tmp2 AS 
 SELECT gid, 
 	shp_id, 
-	project,
 	dmcdate,
 	lengthwidt, 
 	main_direc, 
@@ -30,7 +29,7 @@ SELECT gid,
 	geom
  FROM aspectlayer, tmp
  WHERE ST_Intersects(geom, rast)
-GROUP BY gid, shp_id, project, dmcdate, lengthwidt, main_direc, slope_mean, geom;
+GROUP BY gid, shp_id, dmcdate, lengthwidt, main_direc, slope_mean, geom;
 
 CREATE TABLE RiverSide AS
  SELECT *

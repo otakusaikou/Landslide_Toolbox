@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 '''
 Created on 2014/04/21
-Updated on 2014/07/05
+Updated on 2014/09/14
 @author: Otakusaikou
 '''
 import pygtk
@@ -92,11 +92,24 @@ class ToolBox:
     #close button 
     def close_button_event(self, widget, toolbar=None):
         #turn off every subprocess if close button clicked
+        #check whether all the subprocess are terminated
+        if None in map(lambda p: p.poll(), self.subproc):
+            messagedialog = gtk.MessageDialog(None,
+                gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
+                gtk.BUTTONS_YES_NO, "There still have subprocess running, are you sure you want to close all of them?")
+            messagedialog.set_position(gtk.WIN_POS_CENTER)
+            response = messagedialog.run()
+            messagedialog.destroy()
+            if response == gtk.RESPONSE_NO:
+                return
+
+        #turn off every subprocess 
         try:
             for p in self.subproc:
                 p.terminate()
         except:
             pass
+
         gtk.main_quit()
     #config setting menu    
     def config_menu(self, widget, data):
@@ -124,11 +137,24 @@ class ToolBox:
             os.chdir(root)
         #quit event 
         elif label == "_Quit":
+            #check whether all the subprocess are terminated
+            if None in map(lambda p: p.poll(), self.subproc):
+                messagedialog = gtk.MessageDialog(None,
+                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
+                    gtk.BUTTONS_YES_NO, "There still have subprocess running, are you sure you want to close all of them?")
+                messagedialog.set_position(gtk.WIN_POS_CENTER)
+                response = messagedialog.run()
+                messagedialog.destroy()
+                if response == gtk.RESPONSE_NO:
+                    return
+
+            #turn off every subprocess 
             try:
                 for p in self.subproc:
                     p.terminate()
             except:
                 pass
+
             gtk.main_quit()
 
     #about dialog
@@ -142,7 +168,7 @@ class ToolBox:
         dialog.set_comments("This program is witten for preprocessing of landslide data.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(os.getcwd(), "bin/Img/ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(os.getcwd(), "bin/Img/logo.png")))
 
         #show dialog
         dialog.run()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/25
-Updated on 2014/07/05
+Updated on 2014/09/14
 @author: Otakusaikou
 Description: This program is a GUI for uploading shapefile
 '''
@@ -113,7 +113,7 @@ class GUI:
         dialog.set_comments("This program is witten to load the results of landslide data to database.")
         dialog.set_license("Department of Land Economics, NCCU (c) All RIGHTS RESERVED\thttp://goo.gl/NK8Lk0")
         dialog.set_website("http://goo.gl/NK8Lk0")
-        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(uploadpath, "Img/ncculogo.png")))
+        dialog.set_logo(gtk.gdk.pixbuf_new_from_file(os.path.join(uploadpath, "Img/logo.png")))
 
         #show dialog
         dialog.run()
