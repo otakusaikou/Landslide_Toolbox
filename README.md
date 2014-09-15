@@ -164,3 +164,8 @@ Update Log
 ***
 ####2014-09-14 11:18
 + 1. All: Logo in help dialog has been changed.  
+
+***
+####2014-09-15 21:43
++ 1. Toolbox: Bug in message dialog fixed.  
++ 2. All: Version Up.  

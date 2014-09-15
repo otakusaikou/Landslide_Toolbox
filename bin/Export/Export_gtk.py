@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 '''
 Created on 2013/10/15
-Updated on 2014/09/14
+Updated on 2014/09/15
 @author: Otakusaikou
 '''
 #The GUI for Db_extractor.
@@ -488,7 +488,7 @@ class GUI(gtk.Window):
     def show_about(self, widget, data):
         dialog = gtk.AboutDialog()
         dialog.set_name("Export")
-        dialog.set_version("1.0")
+        dialog.set_version("1.1")
         dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])
         dialog.set_documenters(["Shih-Kuang Chang", "Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])
         dialog.set_artists(["Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])

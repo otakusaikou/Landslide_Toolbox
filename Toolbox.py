@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/21
-Updated on 2014/09/14
+Updated on 2014/09/15
 @author: Otakusaikou
 '''
 import pygtk
@@ -98,7 +98,7 @@ class ToolBox:
             messagedialog.set_position(gtk.WIN_POS_CENTER)
             response = messagedialog.run()
             messagedialog.destroy()
-            if response == gtk.RESPONSE_NO:
+            if response != gtk.RESPONSE_YES:
                 return
 
         #turn off every subprocess 
@@ -139,11 +139,11 @@ class ToolBox:
             if None in map(lambda p: p.poll(), self.subproc):
                 messagedialog = gtk.MessageDialog(None, 
                     gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
-                    gtk.BUTTONS_YES_NO, "Still have subprocess running, are you sure you want to close all of them?") 
+                    gtk.BUTTONS_YES_NO, "There still have subprocess running, are you sure you want to close all of them?") 
                 messagedialog.set_position(gtk.WIN_POS_CENTER)
                 response = messagedialog.run()
                 messagedialog.destroy()
-                if response == gtk.RESPONSE_NO:
+                if response != gtk.RESPONSE_YES:
                     return
 
             #turn off every subprocess 
@@ -159,7 +159,7 @@ class ToolBox:
     def show_about(self, widget, data):
         dialog = gtk.AboutDialog()
         dialog.set_name("Landslide Toolbox")
-        dialog.set_version("1.0")
+        dialog.set_version("1.1")
         dialog.set_authors(["Jihn-Fa Jan", "Fan-En Kung", "Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])
         dialog.set_documenters(["Shih-Kuang Chang", "Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])
         dialog.set_artists(["Li-Sheng Chen (Otakusaikou), otakuzyoutou@gmail.com"])
