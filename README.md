@@ -169,3 +169,7 @@ Update Log
 ####2014-09-15 21:43
 + 1. Toolbox: Bug in message dialog fixed.  
 + 2. All: Version Up.  
+
+***
+####2014-09-17 10:28
++ 1. Analysis: Bug in recalculation of main direction and length width ratio has been fixed.  
