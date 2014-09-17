@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2013/08/15
-Updated on 2014/09/14
+Updated on 2014/09/17
 @author: Otakusaikou
 '''
 import os
@@ -300,6 +300,29 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
             cur.execute(sql) 
             conn.commit()
             
+            #check number of point in every polygons, if less than 2 points, change the resolution to 1 meter
+            sql = """
+                    SELECT rid, COUNT(*)
+                    FROM TP
+                    GROUP BY rid
+                    ORDER BY rid;"""
+            cur.execute(sql) 
+            ans = cur.fetchall()
+            for i in range(len(ans)):
+                row = ans[i]
+                if row[1] <= 2:
+                    sql = """
+                            DELETE FROM TP
+                            WHERE rid = %d;
+
+                            INSERT INTO TP
+                            SELECT rid, (ST_PixelAsPoints(rast)).*
+                            FROM (SELECT ST_AsRaster(geom, 1.0, 1.0, '8BUI') rast, gid rid
+                                  FROM inputdata
+                                  WHERE gid = %d) AS T1_R;""" % (row[0], row[0])
+                    cur.execute(sql)  
+                    conn.commit()
+
             sql = """
                     SELECT rid, var_pop(ST_X(geom)), var_pop(-ST_Y(geom)), covar_pop(-ST_Y(geom), ST_X(geom))
                     FROM TP
@@ -326,7 +349,6 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
                 length_width_ev.append(sqrt(lambda1/lambda2))
             cur.execute(sql)
             conn.commit()
-            
             sql = """
                     SELECT MAX(ST_X(geom)), MIN(ST_X(geom)), MAX(ST_Y(geom)), MIN(ST_Y(geom))
                     FROM TP
@@ -348,8 +370,8 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
                 
                 length_width = min(length_width_bb[i], length_width_ev[i])
                 sql += ("UPDATE inputdata SET (Main_direc, LengthWidt) = (%f, %f) WHERE gid = %s;\n" % (main_direc[i], length_width, ans[i][0]))
-                cur.execute(sql + "DROP TABLE IF EXISTS TP;\n")
-                conn.commit()
+            cur.execute(sql + "DROP TABLE IF EXISTS TP;\n")
+            conn.commit()
         except:
             #delete template tables
             conn.rollback()
