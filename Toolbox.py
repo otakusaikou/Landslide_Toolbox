@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 Created on 2014/04/21
-Updated on 2014/09/15
+Updated on 2014/09/24
 @author: Otakusaikou
 '''
 import pygtk
@@ -102,11 +102,11 @@ class ToolBox:
                 return
 
         #turn off every subprocess 
-        try:
-            for p in self.subproc:
+        for p in self.subproc:
+            try:
                 p.terminate()
-        except:
-            pass
+            except:
+                pass
 
         gtk.main_quit()
     #config setting menu    
@@ -147,11 +147,11 @@ class ToolBox:
                     return
 
             #turn off every subprocess 
-            try:
-                for p in self.subproc:
+            for p in self.subproc:
+                try:
                     p.terminate()
-            except:
-                pass
+                except:
+                    pass
 
             gtk.main_quit()
 
