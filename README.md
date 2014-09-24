@@ -177,3 +177,7 @@ Update Log
 ***
 ####2014-09-17 10:40
 + 1. Analysis: Bug in recalculation of main direction and length width ratio has been fixed.  
+
+***
+####2014-09-24 14:44
++ 1. Toolbox: Bug in termination of subprocess has been fixed.  
