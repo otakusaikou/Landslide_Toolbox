@@ -349,7 +349,7 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
 
                 #let lambda2 be 1 if it's value is too close to zero
                 if not round(lambda2, 6):
-                    lambda2 = 1
+                    lambda2 = 1.0
 
                 length_width_ev.append(sqrt(lambda1/lambda2))
                 
