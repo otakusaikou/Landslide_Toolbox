@@ -346,7 +346,13 @@ def landslide_analysis(conn, inputdir, outputdir, slopelayer, overwriteSlope, as
                 main_direc.append(degrees(theta))
                 #rotate polygons
                 sql += "UPDATE TP SET geom = ST_Rotate(geom, %f) WHERE rid = %d;\n" % (theta, var_cov[0])
+
+                #let lambda2 be 1 if it's value is too close to zero
+                if not round(lambda2, 6):
+                    lambda2 = 1.0
+
                 length_width_ev.append(sqrt(lambda1/lambda2))
+
             cur.execute(sql)
             conn.commit()
             sql = """

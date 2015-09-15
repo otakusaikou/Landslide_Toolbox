@@ -177,3 +177,8 @@ Update Log
 ***
 ####2014-09-24 14:49
 + 1. Toolbox: Bug in termination of subprocess has been fixed. 
+
+####2015-09-15 10:22
++ 1.  Analysis:   
+  + Add new sel files.   
+  + Fix the bug caused by the lambda2 having zero value.  
