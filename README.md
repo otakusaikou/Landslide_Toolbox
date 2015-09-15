@@ -165,19 +165,26 @@ Update Log
 
 ***
 ####2014-09-14 11:28
-+ 1. Export, Analysis, Merge, Zonal Split: Delete attribute 'project'.  
-+ 2. Toolbox: Add message dialog to prompt users if they trying to terminate the toolbox while other subprocess still running.  
-+ 3. All: Logo in help dialog has been changed.
++ 1.  Export, Analysis, Merge, Zonal Split: Delete attribute 'project'.  
++ 2.  Toolbox: Add message dialog to prompt users if they trying to terminate the toolbox while other subprocess still running.  
++ 3.  All: Logo in help dialog has been changed.
 
 ***
 ####2014-09-15 22:12
-+ 1. Toolbox: Bug in message dialog fixed.  
-+ 2. All: Version Up.  
++ 1.  Toolbox: Bug in message dialog fixed.  
++ 2.  All: Version Up.  
 
 ***
 ####2014-09-17 10:40
-+ 1. Analysis: Bug in recalculation of main direction and length width ratio has been fixed.  
++ 1.  Analysis: Bug in recalculation of main direction and length width ratio has been fixed.  
 
 ***
 ####2014-09-24 14:44
-+ 1. Toolbox: Bug in termination of subprocess has been fixed.  
++ 1.  Toolbox: Bug in termination of subprocess has been fixed.  
+
+***
+####2015-09-15 10:09
++ 1.  Analysis:   
+  + Add new sel files.   
+  + Fix the bug caused by the lambda2 having zero value.  
+
