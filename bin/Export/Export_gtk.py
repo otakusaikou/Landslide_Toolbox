@@ -266,7 +266,7 @@ class GUI(gtk.Window):
             reloadConfig()
             con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
             cur = con.cursor()
-            sql = "SELECT DISTINCT MIN(project_date), MAX(project_date) FROM tmp_query WHERE project_date IS NOT NULL" 
+            sql = "SELECT DISTINCT MIN(project_date)::text, MAX(project_date)::text FROM project WHERE project_date IS NOT NULL" 
             cur.execute(sql)
             
         except psycopg2.DatabaseError, e:
@@ -761,7 +761,6 @@ class GUI(gtk.Window):
             messagedialog = gtk.MessageDialog(self, 
                     gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, 
                     gtk.BUTTONS_CLOSE, '1 shapefile have been generated.\n\nCheck the log file "log.txt" in output directory for more information.')
-                    
         log.write("-"*34 + time.strftime("%Y%m%d_%H%M%S", time.gmtime()) + "-"*34 + "\n")
         log.close()
         messagedialog.set_position(gtk.WIN_POS_CENTER)
@@ -773,18 +772,6 @@ def create_field_list():
         reloadConfig()
         con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
         cur = con.cursor()
-        sql = """
-              DROP VIEW IF EXISTS tmp_query;
-              CREATE VIEW tmp_query AS
-              SELECT *
-              FROM (SELECT slide_id, project_date::text, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y, geom
-                    FROM slide_area, project, admin_area, working_circle, reservoir, watershed, forest_district, basin
-                    WHERE project_no = project_id AND county_no = county_id AND town_no = town_id AND workingcircle_no = workingcircle_id AND reservoir_no = reservoir_id AND water_no = water_id AND forest_no = forest_id AND basin_no = basin_id
-                    GROUP BY slide_id, geom, project_date, workingcircle_name, forest_name, county_name, town_name, reservoir_name, water_name, basin_name, area, centroid_x, centroid_y) AS T
-        """
-        cur.execute(sql)
-        con.commit()
-        
         sql = "SELECT COLUMN_NAME FROM Information_Schema.COLUMNS WHERE TABLE_NAME = 'tmp_query' ORDER BY ORDINAL_POSITION"
         cur.execute(sql)
         
@@ -802,7 +789,45 @@ def get_records(fieldname, num):
     try:
         con = psycopg2.connect(database = dbname, user = user, password = password, host = host, port = port)
         cur = con.cursor()
-        sql = "SELECT DISTINCT %s FROM tmp_query WHERE %s IS NOT NULL" % (fieldname, fieldname)
+        field_dict = {
+            "slide_id": "slide_area", 
+            "project_date": "project",
+            "workingcircle_name": "working_circle",
+            "forest_name": "forest_district",
+            "county_name": "admin_area",
+            "town_name": "admin_area",
+            "reservoir_name": "reservoir",
+            "water_name": "watershed",
+            "basin_name": "basin",
+            "input_date": "slide_area",
+            "map_name": "slide_area",
+            "remarks": "slide_area",
+            "area": "slide_area",
+            "centroid_x": "slide_area",
+            "centroid_y": "slide_area",
+        }
+
+        # For query of massive data
+        isstring = fieldname not in ["slide_id", "area", "centroid_x", "centroid_y"]
+        if not isstring:
+            if num == 10:
+                sql = """WITH params AS (SELECT (SELECT reltuples::bigint AS estimate 
+                                         FROM pg_class
+                                         WHERE relname='slide_area') AS id_span)
+                         SELECT DISTINCT %s
+                         FROM (SELECT DISTINCT 1 + trunc(random() * p.id_span)::integer AS id
+                               FROM params AS p
+                                    , generate_series(1, 100) g) AS r
+                               JOIN tmp_query ON slide_id = id
+                         LIMIT  10;""" % fieldname
+            else:
+                sql = "SELECT DISTINCT %s FROM tmp_query WHERE %s IS NOT NULL" % (fieldname, fieldname)
+        else:
+            tablename = field_dict[fieldname]
+            sql = "SELECT DISTINCT %s::text FROM %s WHERE %s IS NOT NULL" % (fieldname, tablename, fieldname)
+            if num == 10:
+                sql += " LIMIT 10"
+
         cur.execute(sql)
         
     except psycopg2.DatabaseError, e:
@@ -814,24 +839,13 @@ def get_records(fieldname, num):
     if len(result) == 0:
         return [[], False]
 
-    if num == 10:
-        if isinstance(result[0][0], str) or isinstance(result[0][0], unicode) or isinstance(result[0][0], unicode):
-            result = [row[0].decode("big5") for row in result][:10]
-            result.sort()
-            return [result, True]
-        else:
-            result = [row[0] for row in result][:10]
-            result.sort()
-            return [result, False]
+    if isstring:
+        result = [row[0].decode("big5") for row in result]
     else:
-        if isinstance(result[0][0], str) or isinstance(result[0][0], unicode):
-            result = [row[0].decode("big5") for row in result] 
-            result.sort()
-            return [result, True]
-        else:
-            result = [row[0] for row in result]
-            result.sort()
-            return [result, False]
+        result = [row[0] for row in result]
+
+    result.sort()
+    return [result, isstring]
 
 #read config file
 def reloadConfig():

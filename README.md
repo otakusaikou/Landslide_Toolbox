@@ -183,3 +183,7 @@ Update Log
 + 1.  Analysis:   
   + Add new sel files.   
   + Fix the bug caused by the lambda2 having zero value.  
+
+***
+####2016-05-07 02:50
++ 1.  Export: Improved the query efficiency.  
